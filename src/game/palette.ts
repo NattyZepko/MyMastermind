@@ -17,10 +17,10 @@ export const PALETTE: readonly PaletteColor[] = [
 	{ id: 'brown', label: 'Brown', hex: '#9A6324' },
 	{ id: 'white', label: 'White', hex: '#ffffff' },
 	{ id: 'grey', label: 'Grey', hex: '#6b6b6b' },
-	{ id: 'navy', label: 'Navy', hex: '#1c1c84' },
-	{ id: 'darkGreen', label: 'Dark Green', hex: '#144819' },
-	{ id: 'cyan', label: 'Cyan', hex: '#7cf0f4' },
 	{ id: 'black', label: 'Black', hex: '#000000' },
+	{ id: 'navy', label: 'Navy', hex: '#1c1c84' },
+	{ id: 'cyan', label: 'Cyan', hex: '#7cf0f4' },
+	{ id: 'darkGreen', label: 'Dark Green', hex: '#144819' },
 ];
 
 export const PALETTE_IDS = PALETTE.map((c) => c.id);
