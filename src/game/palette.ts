@@ -15,11 +15,11 @@ export const PALETTE: readonly PaletteColor[] = [
 	{ id: 'purple', label: 'Purple', hex: '#a855f7' },
 	{ id: 'pink', label: 'Pink', hex: '#ec4899' },
 	{ id: 'brown', label: 'Brown', hex: '#9A6324' },
-	{ id: 'cyan', label: 'Cyan', hex: '#42d4f4' },
-	{ id: 'lime', label: 'Lime', hex: '#bfef45' },
+	{ id: 'white', label: 'White', hex: '#ffffff' },
+	{ id: 'grey', label: 'Grey', hex: '#6b6b6b' },
 	{ id: 'navy', label: 'Navy', hex: '#1c1c84' },
-	{ id: 'lavender', label: 'Lavender', hex: '#dcbeff' },
-	{ id: 'mint', label: 'Mint', hex: '#aaffc3' },
+	{ id: 'darkGreen', label: 'Dark Green', hex: '#144819' },
+	{ id: 'cyan', label: 'Cyan', hex: '#7cf0f4' },
 	{ id: 'black', label: 'Black', hex: '#000000' },
 ];
 
