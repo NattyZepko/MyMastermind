@@ -1,0 +1,525 @@
+.app {
+	max-width: 860px;
+	margin: 0 auto;
+	padding: 2rem 1rem 3rem;
+	display: grid;
+	gap: 1rem;
+}
+
+.confetti {
+	position: fixed;
+	inset: 0;
+	pointer-events: none;
+	z-index: 9999;
+}
+
+.header {
+	display: flex;
+	align-items: flex-start;
+	justify-content: space-between;
+	gap: 1rem;
+}
+
+.title {
+	margin: 0;
+	font-size: 2rem;
+	line-height: 1.2;
+}
+
+.subtitle {
+	margin: 0.25rem 0 0;
+	color: var(--muted);
+}
+
+.headerActions {
+	display: flex;
+	gap: 0.5rem;
+}
+
+.panel {
+	background: var(--panel);
+	border: 1px solid var(--border);
+	border-radius: 14px;
+	padding: 1rem;
+}
+
+.guessForm {
+	display: grid;
+	gap: 0.75rem;
+}
+
+.label {
+	font-weight: 600;
+}
+
+.guessRow {
+	display: grid;
+	grid-template-columns: 1fr auto;
+	gap: 0.75rem;
+	align-items: center;
+}
+
+.guessInput {
+	width: 100%;
+	border-radius: 12px;
+	border: 1px solid var(--border);
+	padding: 0.85rem 0.9rem;
+	background: var(--input);
+	color: inherit;
+	font-size: 1.1rem;
+	letter-spacing: 0.25em;
+	font-variant-numeric: tabular-nums;
+}
+
+.guessInput:disabled {
+	opacity: 0.7;
+}
+
+.error {
+	margin: 0;
+	color: var(--danger);
+	font-size: 0.95rem;
+}
+
+.legend {
+	display: flex;
+	flex-wrap: wrap;
+	gap: 0.5rem;
+}
+
+.chip {
+	display: inline-flex;
+	align-items: center;
+	padding: 0.2rem 0.55rem;
+	border-radius: 999px;
+	font-size: 0.85rem;
+	border: 1px solid var(--border);
+	background: rgba(255, 255, 255, 0.03);
+}
+
+.chipGood {
+	border-color: rgba(34, 197, 94, 0.35);
+	box-shadow:
+		0 0 0 1px rgba(34, 197, 94, 0.08),
+		0 0 12px rgba(34, 197, 94, 0.12);
+}
+
+.chipWarn {
+	border-color: rgba(245, 158, 11, 0.35);
+	box-shadow:
+		0 0 0 1px rgba(245, 158, 11, 0.08),
+		0 0 12px rgba(245, 158, 11, 0.12);
+}
+
+.solved {
+	margin-top: 0.75rem;
+	padding: 0.85rem 0.9rem;
+	border-radius: 12px;
+	background: rgba(34, 197, 94, 0.08);
+	border: 1px solid rgba(34, 197, 94, 0.25);
+}
+
+.historyHeader {
+	display: flex;
+	justify-content: space-between;
+	align-items: baseline;
+	gap: 1rem;
+	margin-bottom: 0.75rem;
+}
+
+.h2 {
+	margin: 0;
+	font-size: 1.1rem;
+}
+
+.muted {
+	color: var(--muted);
+}
+
+.history {
+	list-style: none;
+	padding: 0;
+	margin: 0;
+	display: grid;
+	gap: 0.6rem;
+}
+
+.historyItem {
+	display: grid;
+	grid-template-columns: 1fr auto;
+	gap: 0.75rem;
+	align-items: center;
+	padding: 0.75rem;
+	border-radius: 12px;
+	border: 1px solid var(--border);
+	background: rgba(255, 255, 255, 0.02);
+}
+
+.guessDigits {
+	display: inline-flex;
+	gap: 0.5rem;
+}
+
+.digit {
+	width: 2.2rem;
+	height: 2.2rem;
+	display: inline-flex;
+	align-items: center;
+	justify-content: center;
+	border-radius: 10px;
+	border: 1px solid var(--border);
+	background: rgba(255, 255, 255, 0.03);
+}
+
+.result {
+	display: inline-flex;
+	gap: 0.5rem;
+}
+
+.badge {
+	min-width: 2.1rem;
+	height: 2.1rem;
+	padding: 0 0.6rem;
+	border-radius: 999px;
+	display: inline-flex;
+	align-items: center;
+	justify-content: center;
+	font-weight: 800;
+	border: 1px solid var(--border);
+}
+
+.badge.good {
+	background: rgba(34, 197, 94, 0.12);
+	border-color: rgba(34, 197, 94, 0.35);
+}
+
+.badge.warn {
+	background: rgba(245, 158, 11, 0.12);
+	border-color: rgba(245, 158, 11, 0.35);
+}
+
+button.secondary {
+	background: transparent;
+	border: 1px solid var(--border);
+}
+
+.headerMenuButton {
+	border-color: rgba(245, 158, 11, 0.35);
+	background-color: #f59e0b;
+	color: #aa5f0e;
+	box-shadow:
+		0 10px 22px rgba(120, 53, 15, 0.25),
+		0 0 0 3px rgba(245, 158, 11, 0.08);
+}
+
+.headerMenuButton:hover {
+	border-color: rgba(245, 158, 11, 0.55);
+	box-shadow:
+		0 14px 28px rgba(120, 53, 15, 0.32),
+		0 0 0 3px rgba(245, 158, 11, 0.12),
+		0 0 26px rgba(245, 158, 11, 0.16);
+}
+
+.headerMenuButton:focus-visible {
+	outline: none;
+	border-color: rgba(245, 158, 11, 0.65);
+	box-shadow:
+		0 14px 28px rgba(120, 53, 15, 0.34),
+		0 0 0 4px rgba(245, 158, 11, 0.18),
+		0 0 34px rgba(245, 158, 11, 0.22);
+}
+
+.headerNewGameButton {
+	border-color: rgba(248, 113, 113, 0.35);
+	color: #943525;
+	background-color: #f87171;
+	box-shadow:
+		0 10px 22px rgba(239, 68, 68, 0.14),
+		0 0 0 3px rgba(239, 68, 68, 0.06);
+}
+
+.headerNewGameButton:hover {
+	border-color: rgba(248, 113, 113, 0.55);
+	box-shadow:
+		0 14px 28px rgba(239, 68, 68, 0.18),
+		0 0 0 3px rgba(239, 68, 68, 0.1),
+		0 0 26px rgba(239, 68, 68, 0.12);
+}
+
+.headerNewGameButton:focus-visible {
+	outline: none;
+	border-color: rgba(248, 113, 113, 0.65);
+	box-shadow:
+		0 14px 28px rgba(239, 68, 68, 0.2),
+		0 0 0 4px rgba(239, 68, 68, 0.14),
+		0 0 34px rgba(239, 68, 68, 0.14);
+}
+
+.paletteHeader {
+	display: flex;
+	justify-content: space-between;
+	align-items: baseline;
+	gap: 1rem;
+	margin-bottom: 0.75rem;
+}
+
+.selectedLabel {
+	display: inline-flex;
+	align-items: center;
+	gap: 0.45rem;
+}
+
+.swatchInline {
+	width: 0.85rem;
+	height: 0.85rem;
+	border-radius: 6px;
+	border: 1px solid rgba(255, 255, 255, 0.28);
+	display: inline-block;
+}
+
+.palette {
+	display: flex;
+	flex-wrap: wrap;
+	gap: 0.6rem;
+}
+
+.swatch {
+	width: 2.15rem;
+	height: 2.15rem;
+	border-radius: 10px;
+	border: 1px solid rgba(255, 255, 255, 0.2);
+	padding: 0;
+	cursor: pointer;
+}
+
+.swatch.selected {
+	outline: 3px solid rgba(255, 255, 255, 0.35);
+	outline-offset: 2px;
+}
+
+.guessHeader {
+	display: flex;
+	justify-content: space-between;
+	align-items: center;
+	gap: 1rem;
+	margin-bottom: 0.75rem;
+}
+
+.guessMeta {
+	display: inline-flex;
+	gap: 0.5rem;
+	flex-wrap: wrap;
+	justify-content: flex-end;
+}
+
+.metaPill {
+	display: inline-flex;
+	align-items: center;
+	padding: 0.15rem 0.55rem;
+	border-radius: 999px;
+	border: 1px solid var(--border);
+	background: rgba(255, 255, 255, 0.03);
+	color: var(--muted);
+	font-size: 0.85rem;
+}
+
+.guessActions {
+	display: inline-flex;
+	gap: 0.5rem;
+}
+
+.pegs {
+	display: grid;
+	gap: 0.65rem;
+}
+
+.peg {
+	width: 2.5rem;
+	height: 2.5rem;
+	border-radius: 12px;
+	border: 1px solid rgba(255, 255, 255, 0.2);
+	background: rgba(255, 255, 255, 0.03);
+	padding: 0;
+	cursor: inherit;
+	box-shadow:
+		0 14px 28px rgba(196, 210, 125, 0.2),
+		0 0 0 4px rgba(199, 195, 87, 0.14),
+		0 0 34px rgba(157, 166, 104, 0.14);
+}
+
+.peg:disabled {
+	opacity: 0.8;
+	cursor: inherit;
+}
+
+.secretReveal {
+	margin-top: 0.75rem;
+	display: inline-flex;
+	gap: 0.5rem;
+}
+
+.secretPeg {
+	width: 2.1rem;
+	height: 2.1rem;
+	border-radius: 10px;
+	border: 1px solid rgba(255, 255, 255, 0.25);
+	background: rgba(255, 255, 255, 0.03);
+	display: inline-block;
+}
+
+.status {
+	margin: 0.5rem 0 0;
+	color: var(--muted);
+}
+
+/* Main menu */
+.menu {
+	max-width: 860px;
+	margin: 0 auto;
+	padding: 2rem 1rem 3rem;
+	display: grid;
+	gap: 1rem;
+}
+
+.menuHeader {
+	display: flex;
+	justify-content: space-between;
+	align-items: flex-start;
+}
+
+.formGrid {
+	display: grid;
+	grid-template-columns: repeat(2, minmax(0, 1fr));
+	gap: 1rem;
+	margin-top: 0.75rem;
+}
+
+.formGrid.formGridSingle {
+	grid-template-columns: 1fr;
+}
+
+@media (max-width: 700px) {
+	.formGrid {
+		grid-template-columns: 1fr;
+	}
+}
+
+.field {
+	display: grid;
+	gap: 0.4rem;
+}
+
+.fieldLabel {
+	font-weight: 600;
+}
+
+.fieldHelp {
+	color: var(--muted);
+	font-size: 0.85rem;
+}
+
+.numberInput {
+	width: 100%;
+	border-radius: 12px;
+	border: 1px solid var(--border);
+	padding: 0.55rem 0.7rem;
+	background: var(--input);
+	color: inherit;
+}
+
+.numberInput.compact {
+	width: 7rem;
+	max-width: 100%;
+}
+
+.numberInput.inline {
+	width: 4.5rem;
+	padding: 0.35rem 0.5rem;
+}
+
+.radioGroup {
+	display: grid;
+	gap: 0.75rem;
+	margin-top: 0.75rem;
+}
+
+.radioRow {
+	display: grid;
+	grid-template-columns: auto minmax(0, 1fr) auto;
+	align-items: center;
+	column-gap: 0.6rem;
+	row-gap: 0.35rem;
+}
+
+.modeControls {
+	display: inline-flex;
+	align-items: center;
+	gap: 0.45rem;
+	min-width: 0;
+	justify-content: flex-end;
+	white-space: nowrap;
+}
+
+@media (max-width: 520px) {
+	.radioRow {
+		grid-template-columns: auto 1fr;
+	}
+
+	.modeControls {
+		grid-column: 1 / -1;
+		justify-content: flex-start;
+		white-space: normal;
+	}
+}
+
+.difficultyExtras {
+	margin-top: 0.75rem;
+	display: flex;
+	align-items: center;
+	gap: 0.75rem;
+	justify-content: space-between;
+	flex-wrap: wrap;
+}
+
+.checkboxRow {
+	display: inline-flex;
+	align-items: center;
+	gap: 0.5rem;
+}
+
+.menuActions {
+	margin-top: 1rem;
+	display: flex;
+	justify-content: flex-end;
+}
+
+.playButton {
+	background: linear-gradient(180deg, #f6d365 0%, #f59e0b 100%);
+	color: #1b1406;
+	border: 1px solid rgba(250, 204, 21, 0.55);
+	font-weight: bold;
+	box-shadow:
+		0 10px 24px rgba(245, 158, 11, 0.28),
+		0 0 0 3px rgba(250, 204, 21, 0.12),
+		0 0 28px rgba(250, 204, 21, 0.24);
+}
+
+.playButton:hover {
+	filter: brightness(1.04);
+	box-shadow:
+		0 14px 30px rgba(245, 158, 11, 0.34),
+		0 0 0 3px rgba(250, 204, 21, 0.18),
+		0 0 40px rgba(250, 204, 21, 0.32);
+}
+
+.playButton:active {
+	transform: translateY(1px);
+}
+
+.playButton:focus-visible {
+	outline: none;
+	box-shadow:
+		0 14px 30px rgba(245, 158, 11, 0.34),
+		0 0 0 4px rgba(250, 204, 21, 0.28),
+		0 0 42px rgba(250, 204, 21, 0.36);
+}
