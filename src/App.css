@@ -438,6 +438,63 @@ button.secondary {
 	padding: 0.35rem 0.5rem;
 }
 
+.stepper {
+	display: inline-flex;
+	align-items: stretch;
+	justify-self: start;
+	width: fit-content;
+	max-width: 100%;
+	height: 2.6rem;
+	border: 1px solid var(--border);
+	border-radius: 12px;
+	overflow: hidden;
+	background: var(--input);
+}
+
+.stepper .numberInput {
+	border: 0;
+	border-radius: 0;
+	background: transparent;
+	text-align: center;
+	height: 100%;
+	padding-top: 0;
+	padding-bottom: 0;
+}
+
+.stepperButtons {
+	display: grid;
+	grid-template-rows: 1fr 1fr;
+	width: 2.25rem;
+	border-left: 1px solid var(--border);
+}
+
+.stepperButton {
+	width: 100%;
+	height: 100%;
+	padding: 0;
+	border: 0;
+	border-radius: 0;
+	background: rgba(255, 255, 255, 0.06);
+	color: inherit;
+	font-weight: 900;
+	font-size: 0.85rem;
+	line-height: 1;
+	display: flex;
+	align-items: center;
+	justify-content: center;
+	touch-action: manipulation;
+	user-select: none;
+}
+
+.stepperButton + .stepperButton {
+	border-top: 1px solid var(--border);
+}
+
+.stepperButton:disabled {
+	opacity: 0.45;
+	cursor: not-allowed;
+}
+
 .radioGroup {
 	display: grid;
 	gap: 0.75rem;
@@ -462,6 +519,13 @@ button.secondary {
 }
 
 @media (max-width: 520px) {
+	.stepper {
+		height: 2.9rem;
+	}
+
+	.stepperButtons {
+		width: 2.5rem;
+	}
 	.app,
 	.menu {
 		padding: 1.25rem 0.75rem 2rem;
@@ -503,6 +567,7 @@ button.secondary {
 	.modeControls {
 		grid-column: 1 / -1;
 		justify-content: flex-start;
+		flex-wrap: wrap;
 		white-space: normal;
 	}
 }

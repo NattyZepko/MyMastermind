@@ -1,3 +1,4 @@
+import { useCallback, useEffect, useRef } from 'react';
 import type { GameMode, GameSettings } from '../game/config';
 import {
 	CODE_LENGTH_MAX,
@@ -16,9 +17,215 @@ type MainMenuProps = {
 	onPlay: () => void;
 };
 
-function parseNumberInput(value: string) {
-	const n = Number(value);
-	return Number.isFinite(n) ? n : null;
+function clampInt(value: number, min: number, max: number) {
+	return Math.max(min, Math.min(max, Math.trunc(value)));
+}
+
+function wrapInt(value: number, min: number, max: number) {
+	const range = max - min + 1;
+	if (range <= 0) return min;
+	const normalized = (((value - min) % range) + range) % range;
+	return min + normalized;
+}
+
+function pad2(n: number) {
+	return String(n).padStart(2, '0');
+}
+
+type StepperNumberInputProps = {
+	value: number;
+	min: number;
+	max: number;
+	step?: number;
+	disabled?: boolean;
+	wrap?: boolean;
+	formatValue?: (value: number) => string;
+	repeatDelayMs?: number;
+	repeatIntervalMs?: number;
+	ariaLabel: string;
+	inputClassName: string;
+	onChangeValue: (next: number) => void;
+};
+
+function StepperNumberInput({
+	value,
+	min,
+	max,
+	step = 1,
+	disabled,
+	wrap,
+	formatValue,
+	repeatDelayMs = 350,
+	repeatIntervalMs = 85,
+	ariaLabel,
+	inputClassName,
+	onChangeValue,
+}: StepperNumberInputProps) {
+	const canWrap = Boolean(wrap) && min < max;
+	const decDisabled = Boolean(disabled) || (!canWrap && value <= min);
+	const incDisabled = Boolean(disabled) || (!canWrap && value >= max);
+
+	const valueRef = useRef(value);
+	useEffect(() => {
+		valueRef.current = value;
+	}, [value]);
+
+	const onChangeValueRef = useRef(onChangeValue);
+	useEffect(() => {
+		onChangeValueRef.current = onChangeValue;
+	}, [onChangeValue]);
+
+	const holdRef = useRef<{
+		startTimeoutId: number | null;
+		repeatIntervalId: number | null;
+		suppressClick: boolean;
+	}>({
+		startTimeoutId: null,
+		repeatIntervalId: null,
+		suppressClick: false,
+	});
+
+	const stopHold = useCallback(() => {
+		if (holdRef.current.startTimeoutId != null) {
+			window.clearTimeout(holdRef.current.startTimeoutId);
+			holdRef.current.startTimeoutId = null;
+		}
+		if (holdRef.current.repeatIntervalId != null) {
+			window.clearInterval(holdRef.current.repeatIntervalId);
+			holdRef.current.repeatIntervalId = null;
+		}
+
+		if (holdRef.current.suppressClick) {
+			window.setTimeout(() => {
+				holdRef.current.suppressClick = false;
+			}, 0);
+		}
+	}, []);
+
+	useEffect(() => stopHold, [stopHold]);
+	useEffect(() => {
+		if (disabled) stopHold();
+	}, [disabled, stopHold]);
+
+	const applyDelta = useCallback(
+		(delta: number) => {
+			const current = valueRef.current;
+			const nextRaw = current + delta;
+			const next = wrap
+				? wrapInt(nextRaw, min, max)
+				: clampInt(nextRaw, min, max);
+			if (next !== current) onChangeValueRef.current(next);
+		},
+		[wrap, min, max],
+	);
+
+	const startHold = useCallback(
+		(delta: number) => {
+			applyDelta(delta);
+			holdRef.current.startTimeoutId = window.setTimeout(() => {
+				holdRef.current.repeatIntervalId = window.setInterval(() => {
+					applyDelta(delta);
+				}, repeatIntervalMs);
+			}, repeatDelayMs);
+		},
+		[applyDelta, repeatDelayMs, repeatIntervalMs],
+	);
+
+	const onIncPointerDown = useCallback(
+		(e: React.PointerEvent<HTMLButtonElement>) => {
+			if (incDisabled) return;
+			e.preventDefault();
+			holdRef.current.suppressClick = true;
+			e.currentTarget.setPointerCapture?.(e.pointerId);
+			startHold(step);
+		},
+		[incDisabled, startHold, step],
+	);
+
+	const onDecPointerDown = useCallback(
+		(e: React.PointerEvent<HTMLButtonElement>) => {
+			if (decDisabled) return;
+			e.preventDefault();
+			holdRef.current.suppressClick = true;
+			e.currentTarget.setPointerCapture?.(e.pointerId);
+			startHold(-step);
+		},
+		[decDisabled, startHold, step],
+	);
+
+	const onIncClick = useCallback(
+		(e: React.MouseEvent<HTMLButtonElement>) => {
+			if (incDisabled) return;
+			if (holdRef.current.suppressClick) {
+				e.preventDefault();
+				e.stopPropagation();
+				return;
+			}
+			applyDelta(step);
+		},
+		[applyDelta, incDisabled, step],
+	);
+
+	const onDecClick = useCallback(
+		(e: React.MouseEvent<HTMLButtonElement>) => {
+			if (decDisabled) return;
+			if (holdRef.current.suppressClick) {
+				e.preventDefault();
+				e.stopPropagation();
+				return;
+			}
+			applyDelta(-step);
+		},
+		[applyDelta, decDisabled, step],
+	);
+
+	const displayValue = formatValue ? formatValue(value) : String(value);
+
+	return (
+		<span className="stepper" aria-label={ariaLabel}>
+			<input
+				type="text"
+				inputMode="none"
+				className={`${inputClassName} stepperInput`}
+				value={displayValue}
+				disabled={disabled}
+				readOnly
+				aria-readonly="true"
+				tabIndex={-1}
+				aria-label={ariaLabel}
+			/>
+			<span className="stepperButtons" aria-hidden={false}>
+				<button
+					type="button"
+					className="stepperButton stepperUp"
+					onPointerDown={onIncPointerDown}
+					onPointerUp={stopHold}
+					onPointerCancel={stopHold}
+					onLostPointerCapture={stopHold}
+					onClick={onIncClick}
+					disabled={incDisabled}
+					aria-label={`Increase ${ariaLabel}`}
+					title={`Increase ${ariaLabel}`}
+				>
+					▲
+				</button>
+				<button
+					type="button"
+					className="stepperButton stepperDown"
+					onPointerDown={onDecPointerDown}
+					onPointerUp={stopHold}
+					onPointerCancel={stopHold}
+					onLostPointerCapture={stopHold}
+					onClick={onDecClick}
+					disabled={decDisabled}
+					aria-label={`Decrease ${ariaLabel}`}
+					title={`Decrease ${ariaLabel}`}
+				>
+					▼
+				</button>
+			</span>
+		</span>
+	);
 }
 
 export function MainMenu({ settings, onChange, onPlay }: MainMenuProps) {
@@ -35,6 +242,12 @@ export function MainMenu({ settings, onChange, onPlay }: MainMenuProps) {
 		const seconds = totalSeconds % 60;
 		return { minutes, seconds };
 	})();
+
+	function setTime(minutes: number, seconds: number) {
+		const m = clampInt(minutes, TIME_LIMIT_MINUTES_MIN, TIME_LIMIT_MINUTES_MAX);
+		const s = m >= TIME_LIMIT_MINUTES_MAX ? 0 : clampInt(seconds, 0, 59);
+		set('timeLimitMinutes', m + s / 60);
+	}
 
 	const mode = settings.mode;
 
@@ -60,16 +273,14 @@ export function MainMenu({ settings, onChange, onPlay }: MainMenuProps) {
 						>
 							Colors in secret
 						</div>
-						<input
-							type="number"
-							className="numberInput compact"
+						<StepperNumberInput
+							value={settings.codeLength}
 							min={CODE_LENGTH_MIN}
 							max={CODE_LENGTH_MAX}
-							value={settings.codeLength}
-							onChange={(e) => {
-								const v = parseNumberInput(e.target.value);
-								if (v !== null) set('codeLength', v);
-							}}
+							step={1}
+							ariaLabel="Colors in secret"
+							inputClassName="numberInput compact"
+							onChangeValue={(v) => set('codeLength', v)}
 						/>
 					</label>
 
@@ -80,16 +291,14 @@ export function MainMenu({ settings, onChange, onPlay }: MainMenuProps) {
 						>
 							Palette size
 						</div>
-						<input
-							type="number"
-							className="numberInput compact"
+						<StepperNumberInput
+							value={settings.paletteSize}
 							min={PALETTE_SIZE_MIN}
 							max={PALETTE_SIZE_MAX}
-							value={settings.paletteSize}
-							onChange={(e) => {
-								const v = parseNumberInput(e.target.value);
-								if (v !== null) set('paletteSize', v);
-							}}
+							step={1}
+							ariaLabel="Palette size"
+							inputClassName="numberInput compact"
+							onChangeValue={(v) => set('paletteSize', v)}
 						/>
 					</label>
 				</div>
@@ -155,54 +364,30 @@ export function MainMenu({ settings, onChange, onPlay }: MainMenuProps) {
 						/>
 						<span>Play Time Mode</span>
 						<span className="modeControls">
-							<input
-								type="number"
-								className="numberInput inline"
+							<StepperNumberInput
+								value={timeParts.minutes}
 								min={TIME_LIMIT_MINUTES_MIN}
 								max={TIME_LIMIT_MINUTES_MAX}
 								step={1}
-								value={timeParts.minutes}
 								disabled={mode !== 'time'}
-								onChange={(e) => {
-									const v = parseNumberInput(e.target.value);
-									if (v === null) return;
-									const minutes = Math.max(
-										TIME_LIMIT_MINUTES_MIN,
-										Math.min(TIME_LIMIT_MINUTES_MAX, Math.trunc(v)),
-									);
-									const seconds =
-										minutes >= TIME_LIMIT_MINUTES_MAX ? 0 : timeParts.seconds;
-									set('timeLimitMinutes', minutes + seconds / 60);
-								}}
-								aria-label="Time limit minutes"
+								ariaLabel="Time limit minutes"
+								inputClassName="numberInput inline"
+								onChangeValue={(minutes) => setTime(minutes, timeParts.seconds)}
 							/>
 							<span className="muted">:</span>
-							<input
-								type="number"
-								className="numberInput inline"
-								step={1}
+							<StepperNumberInput
 								value={timeParts.seconds}
+								min={0}
+								max={59}
+								step={1}
+								wrap
+								formatValue={pad2}
 								disabled={
 									mode !== 'time' || timeParts.minutes >= TIME_LIMIT_MINUTES_MAX
 								}
-								onChange={(e) => {
-									const v = parseNumberInput(e.target.value);
-									if (v === null) return;
-									const raw = Math.trunc(v);
-									const wrapped = ((raw % 60) + 60) % 60;
-									set('timeLimitMinutes', timeParts.minutes + wrapped / 60);
-								}}
-								onBlur={(e) => {
-									const v = parseNumberInput(e.target.value);
-									if (v === null) {
-										set('timeLimitMinutes', timeParts.minutes);
-										return;
-									}
-									const raw = Math.trunc(v);
-									const clamped = Math.max(0, Math.min(59, raw));
-									set('timeLimitMinutes', timeParts.minutes + clamped / 60);
-								}}
-								aria-label="Time limit seconds"
+								ariaLabel="Time limit seconds"
+								inputClassName="numberInput inline"
+								onChangeValue={(seconds) => setTime(timeParts.minutes, seconds)}
 							/>
 							<span className="muted">min:sec</span>
 						</span>
@@ -220,18 +405,15 @@ export function MainMenu({ settings, onChange, onPlay }: MainMenuProps) {
 						/>
 						<span>Play Limited Guesses Mode</span>
 						<span className="modeControls">
-							<input
-								type="number"
-								className="numberInput inline"
+							<StepperNumberInput
+								value={settings.guessLimit}
 								min={GUESS_LIMIT_MIN}
 								max={GUESS_LIMIT_MAX}
-								value={settings.guessLimit}
+								step={1}
 								disabled={mode !== 'limited'}
-								onChange={(e) => {
-									const v = parseNumberInput(e.target.value);
-									if (v !== null) set('guessLimit', v);
-								}}
-								aria-label="Guess limit"
+								ariaLabel="Guess limit"
+								inputClassName="numberInput inline"
+								onChangeValue={(v) => set('guessLimit', v)}
 							/>
 							<span className="muted">guesses</span>
 						</span>
