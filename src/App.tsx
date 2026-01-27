@@ -45,6 +45,7 @@ function App() {
 	const [error, setError] = useState<string | null>(null);
 	const [gameStartMs, setGameStartMs] = useState<number | null>(null);
 	const [nowMs, setNowMs] = useState<number>(() => Date.now());
+	const [gaveUp, setGaveUp] = useState(false);
 
 	const solvedAt = useMemo(() => {
 		const index = guesses.findIndex(
@@ -94,7 +95,7 @@ function App() {
 		guessesLeft <= 0;
 
 	const canInteract =
-		screen === 'game' && !isSolved && !isTimeUp && !isOutOfGuesses;
+		screen === 'game' && !gaveUp && !isSolved && !isTimeUp && !isOutOfGuesses;
 
 	useEffect(() => {
 		if (screen !== 'game') return;
@@ -121,6 +122,7 @@ function App() {
 		setError(null);
 		setGameStartMs(Date.now());
 		setNowMs(Date.now());
+		setGaveUp(false);
 	}
 
 	function onPlayFromMenu() {
@@ -139,8 +141,16 @@ function App() {
 		setError(null);
 		setGameStartMs(Date.now());
 		setNowMs(Date.now());
+		setGaveUp(false);
 		setScreen('game');
 	}
+
+	const giveUp = useCallback(() => {
+		if (screen !== 'game') return;
+		if (!canInteract) return;
+		setError(null);
+		setGaveUp(true);
+	}, [canInteract, screen]);
 
 	function clearCurrentGuess() {
 		setCurrentGuess(
@@ -247,12 +257,13 @@ function App() {
 
 	const statusMessage = useMemo(() => {
 		if (screen !== 'game') return null;
+		if (gaveUp) return 'Game over... This was the secret:';
 		if (isSolved)
 			return `Solved in ${solvedAt} guess${solvedAt === 1 ? '' : 'es'}.`;
 		if (isTimeUp) return "Time's up! The secret was:";
 		if (isOutOfGuesses) return 'No guesses left! The secret was:';
 		return null;
-	}, [isOutOfGuesses, isSolved, isTimeUp, screen, solvedAt]);
+	}, [gaveUp, isOutOfGuesses, isSolved, isTimeUp, screen, solvedAt]);
 
 	if (screen === 'menu') {
 		return (
@@ -306,6 +317,18 @@ function App() {
 			/>
 
 			<GuessHistory guesses={guesses} paletteById={activePaletteById} />
+
+			<div className="gameActions">
+				<button
+					type="button"
+					className="giveUpButton"
+					onClick={giveUp}
+					disabled={!canInteract}
+					title="End the game and reveal the secret"
+				>
+					Give up
+				</button>
+			</div>
 		</div>
 	);
 }

@@ -151,6 +151,34 @@
 	gap: 0.6rem;
 }
 
+.gameActions {
+	display: flex;
+	justify-content: flex-end;
+	margin-top: 0.25rem;
+}
+
+.giveUpButton {
+	background: rgba(248, 113, 113, 0.14);
+	border: 1px solid rgba(248, 113, 113, 0.35);
+	color: rgba(255, 255, 255, 0.92);
+	box-shadow:
+		0 8px 18px rgba(239, 68, 68, 0.1),
+		0 0 0 3px rgba(239, 68, 68, 0.06);
+}
+
+.giveUpButton:hover {
+	border-color: rgba(248, 113, 113, 0.55);
+	box-shadow:
+		0 12px 26px rgba(239, 68, 68, 0.16),
+		0 0 0 3px rgba(239, 68, 68, 0.12),
+		0 0 26px rgba(239, 68, 68, 0.14);
+}
+
+.giveUpButton:disabled {
+	opacity: 0.5;
+	cursor: not-allowed;
+}
+
 .historyItem {
 	display: grid;
 	grid-template-columns: 1fr auto;
