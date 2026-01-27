@@ -10,6 +10,8 @@ type GuessPanelProps = {
 	timerText: string | null;
 	guessesLeftText: string | null;
 	secret: string[];
+	showCopyResults?: boolean;
+	onCopyResults?: () => void;
 
 	onClearCurrentGuess: () => void;
 	onSubmitGuess: () => void;
@@ -27,6 +29,8 @@ export function GuessPanel({
 	timerText,
 	guessesLeftText,
 	secret,
+	showCopyResults,
+	onCopyResults,
 	onClearCurrentGuess,
 	onSubmitGuess,
 	onSetPeg,
@@ -119,6 +123,19 @@ export function GuessPanel({
 							);
 						})}
 					</div>
+
+					{showCopyResults && onCopyResults ? (
+						<div className="secretActions">
+							<button
+								type="button"
+								className="copyResultsButton"
+								onClick={onCopyResults}
+								title="Copy your Daily Challenge result"
+							>
+								Copy results
+							</button>
+						</div>
+					) : null}
 				</div>
 			) : null}
 		</section>

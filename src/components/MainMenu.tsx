@@ -2,7 +2,6 @@ import { useCallback, useEffect, useRef, useState } from 'react';
 import demoGif from '../assets/demo.gif';
 import type { GameMode, GameSettings } from '../game/config';
 import {
-	CODE_LENGTH_MAX,
 	CODE_LENGTH_MIN,
 	GUESS_LIMIT_MAX,
 	GUESS_LIMIT_MIN,
@@ -13,10 +12,13 @@ import {
 } from '../game/config';
 import { RainbowTitle } from './RainbowTitle';
 
+const MAIN_MENU_CODE_LENGTH_MAX = 6;
+
 type MainMenuProps = {
 	settings: GameSettings;
 	onChange: (next: GameSettings) => void;
 	onPlay: () => void;
+	onDailyChallenge: () => void;
 };
 
 function clampInt(value: number, min: number, max: number) {
@@ -230,7 +232,12 @@ function StepperNumberInput({
 	);
 }
 
-export function MainMenu({ settings, onChange, onPlay }: MainMenuProps) {
+export function MainMenu({
+	settings,
+	onChange,
+	onPlay,
+	onDailyChallenge,
+}: MainMenuProps) {
 	const [rulesOpen, setRulesOpen] = useState(false);
 
 	function set<K extends keyof GameSettings>(key: K, value: GameSettings[K]) {
@@ -282,11 +289,20 @@ export function MainMenu({ settings, onChange, onPlay }: MainMenuProps) {
 						<StepperNumberInput
 							value={settings.codeLength}
 							min={CODE_LENGTH_MIN}
-							max={CODE_LENGTH_MAX}
+							max={
+								settings.allowDuplicates
+									? MAIN_MENU_CODE_LENGTH_MAX
+									: Math.min(MAIN_MENU_CODE_LENGTH_MAX, settings.paletteSize)
+							}
 							step={1}
 							ariaLabel="Colors in secret"
 							inputClassName="numberInput compact"
-							onChangeValue={(v) => set('codeLength', v)}
+							onChangeValue={(v) =>
+								set(
+									'codeLength',
+									clampInt(v, CODE_LENGTH_MIN, MAIN_MENU_CODE_LENGTH_MAX),
+								)
+							}
 						/>
 					</label>
 
@@ -429,6 +445,14 @@ export function MainMenu({ settings, onChange, onPlay }: MainMenuProps) {
 				<div className="menuActions">
 					<button type="button" onClick={onPlay} className="playButton">
 						Play
+					</button>
+					<button
+						type="button"
+						onClick={onDailyChallenge}
+						className="dailyChallengeButton"
+						title="Start today's Daily Challenge"
+					>
+						Daily challenge
 					</button>
 				</div>
 			</section>

@@ -5,6 +5,9 @@ type HeaderProps = {
 	subtitle?: string;
 	onNewGame?: () => void;
 	onBackToMenu?: () => void;
+	showNewGame?: boolean;
+	pulseNewGame?: boolean;
+	pulseMenu?: boolean;
 };
 
 export function Header({
@@ -12,6 +15,9 @@ export function Header({
 	subtitle,
 	onNewGame,
 	onBackToMenu,
+	showNewGame = true,
+	pulseNewGame = false,
+	pulseMenu = false,
 }: HeaderProps) {
 	return (
 		<header className="header">
@@ -29,16 +35,16 @@ export function Header({
 				{onBackToMenu ? (
 					<button
 						type="button"
-						className="secondary headerMenuButton"
+						className={`secondary headerMenuButton${pulseMenu ? ' pulseGlow' : ''}`}
 						onClick={onBackToMenu}
 					>
 						Menu
 					</button>
 				) : null}
-				{onNewGame ? (
+				{onNewGame && showNewGame ? (
 					<button
 						type="button"
-						className="secondary headerNewGameButton"
+						className={`secondary headerNewGameButton${pulseNewGame ? ' pulseGlow' : ''}`}
 						onClick={onNewGame}
 					>
 						New game

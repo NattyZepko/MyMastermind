@@ -11,7 +11,7 @@ export type GameSettings = {
 
 export const CODE_LENGTH_DEFAULT = 4;
 export const CODE_LENGTH_MIN = 3;
-export const CODE_LENGTH_MAX = 6;
+export const CODE_LENGTH_MAX = 8;
 
 export const PALETTE_SIZE_DEFAULT = 8;
 export const PALETTE_SIZE_MIN = 6;

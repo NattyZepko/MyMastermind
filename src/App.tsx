@@ -15,13 +15,15 @@ import {
 import { cssCursorFor } from './game/cursor';
 import { PALETTE } from './game/palette';
 import type { GuessResult } from './game/types';
-import { generateSecret, scoreGuess } from './mastermind';
+import { generateSecret, generateSecretSeeded, scoreGuess } from './mastermind';
 
 type Screen = 'menu' | 'game';
 
 function App() {
 	const [screen, setScreen] = useState<Screen>('menu');
 	const [settings, setSettings] = useState<GameSettings>(DEFAULT_SETTINGS);
+	const [isDailyChallenge, setIsDailyChallenge] = useState(false);
+	const [dailySeed, setDailySeed] = useState<string | null>(null);
 
 	const normalizedSettings = useMemo(
 		() => normalizeSettings(settings),
@@ -97,6 +99,13 @@ function App() {
 	const canInteract =
 		screen === 'game' && !gaveUp && !isSolved && !isTimeUp && !isOutOfGuesses;
 
+	const isGameOver =
+		screen === 'game' && (isSolved || gaveUp || isTimeUp || isOutOfGuesses);
+
+	function utcDateKey(d = new Date()) {
+		return d.toISOString().slice(0, 10);
+	}
+
 	useEffect(() => {
 		if (screen !== 'game') return;
 		if (!canInteract) return;
@@ -109,11 +118,21 @@ function App() {
 		setSettings(nextSettings);
 		const palette = PALETTE.slice(0, nextSettings.paletteSize);
 		const paletteIds = palette.map((c) => c.id);
-		setSecret(
-			generateSecret(paletteIds, nextSettings.codeLength, {
-				allowDuplicates: nextSettings.allowDuplicates,
-			}),
-		);
+		if (isDailyChallenge) {
+			const seed = dailySeed ?? utcDateKey();
+			setDailySeed(seed);
+			setSecret(
+				generateSecretSeeded(paletteIds, nextSettings.codeLength, seed, {
+					allowDuplicates: nextSettings.allowDuplicates,
+				}),
+			);
+		} else {
+			setSecret(
+				generateSecret(paletteIds, nextSettings.codeLength, {
+					allowDuplicates: nextSettings.allowDuplicates,
+				}),
+			);
+		}
 		setSelectedColorId(null);
 		setCurrentGuess(
 			Array.from({ length: nextSettings.codeLength }, () => null),
@@ -135,8 +154,40 @@ function App() {
 				allowDuplicates: next.allowDuplicates,
 			}),
 		);
+		setIsDailyChallenge(false);
+		setDailySeed(null);
 		setSelectedColorId(null);
 		setCurrentGuess(Array.from({ length: next.codeLength }, () => null));
+		setGuesses([]);
+		setError(null);
+		setGameStartMs(Date.now());
+		setNowMs(Date.now());
+		setGaveUp(false);
+		setScreen('game');
+	}
+
+	function onDailyChallengeFromMenu() {
+		const seed = utcDateKey();
+		const next: GameSettings = {
+			...settings,
+			mode: 'zen',
+			codeLength: 8,
+			paletteSize: 14,
+			allowDuplicates: true,
+		};
+		const normalized = normalizeSettings(next);
+		setSettings(normalized);
+		const palette = PALETTE.slice(0, normalized.paletteSize);
+		const paletteIds = palette.map((c) => c.id);
+		setSecret(
+			generateSecretSeeded(paletteIds, normalized.codeLength, seed, {
+				allowDuplicates: true,
+			}),
+		);
+		setIsDailyChallenge(true);
+		setDailySeed(seed);
+		setSelectedColorId(null);
+		setCurrentGuess(Array.from({ length: normalized.codeLength }, () => null));
 		setGuesses([]);
 		setError(null);
 		setGameStartMs(Date.now());
@@ -148,9 +199,29 @@ function App() {
 	const giveUp = useCallback(() => {
 		if (screen !== 'game') return;
 		if (!canInteract) return;
+		if (isDailyChallenge) return;
 		setError(null);
 		setGaveUp(true);
-	}, [canInteract, screen]);
+	}, [canInteract, isDailyChallenge, screen]);
+
+	const copyDailyResults = useCallback(async () => {
+		if (!isDailyChallenge) return;
+		if (!isSolved || solvedAt === null) return;
+		const text = `I've beaten today's challenge at NattyMastermind.com in ${solvedAt} guesses! See if you can beat my score!`;
+		try {
+			await navigator.clipboard.writeText(text);
+		} catch {
+			const el = document.createElement('textarea');
+			el.value = text;
+			el.setAttribute('readonly', '');
+			el.style.position = 'fixed';
+			el.style.left = '-9999px';
+			document.body.appendChild(el);
+			el.select();
+			document.execCommand('copy');
+			document.body.removeChild(el);
+		}
+	}, [isDailyChallenge, isSolved, solvedAt]);
 
 	function clearCurrentGuess() {
 		setCurrentGuess(
@@ -258,12 +329,24 @@ function App() {
 	const statusMessage = useMemo(() => {
 		if (screen !== 'game') return null;
 		if (gaveUp) return 'Game over... This was the secret:';
-		if (isSolved)
+		if (isSolved) {
+			if (isDailyChallenge && solvedAt !== null) {
+				return `Congratulations — you beat today's Daily Challenge in ${solvedAt} guesses!`;
+			}
 			return `Solved in ${solvedAt} guess${solvedAt === 1 ? '' : 'es'}.`;
+		}
 		if (isTimeUp) return "Time's up! The secret was:";
 		if (isOutOfGuesses) return 'No guesses left! The secret was:';
 		return null;
-	}, [gaveUp, isOutOfGuesses, isSolved, isTimeUp, screen, solvedAt]);
+	}, [
+		gaveUp,
+		isDailyChallenge,
+		isOutOfGuesses,
+		isSolved,
+		isTimeUp,
+		screen,
+		solvedAt,
+	]);
 
 	if (screen === 'menu') {
 		return (
@@ -271,6 +354,7 @@ function App() {
 				settings={settings}
 				onChange={(next) => setSettings(next)}
 				onPlay={onPlayFromMenu}
+				onDailyChallenge={onDailyChallengeFromMenu}
 			/>
 		);
 	}
@@ -280,8 +364,22 @@ function App() {
 			{screen === 'game' && isSolved ? <ConfettiOverlay /> : null}
 			<Header
 				codeLength={normalizedSettings.codeLength}
-				onNewGame={startNewGame}
-				onBackToMenu={() => setScreen('menu')}
+				onNewGame={isDailyChallenge ? undefined : startNewGame}
+				onBackToMenu={() => {
+					setScreen('menu');
+					setSettings((prev) =>
+						normalizeSettings({
+							...prev,
+							codeLength: Math.min(prev.codeLength, 6),
+						}),
+					);
+					setIsDailyChallenge(false);
+					setDailySeed(null);
+					setGaveUp(false);
+				}}
+				showNewGame={!isDailyChallenge}
+				pulseNewGame={!isDailyChallenge && isGameOver}
+				pulseMenu={isDailyChallenge && isGameOver}
 				subtitle={`Mode: ${
 					normalizedSettings.mode === 'zen'
 						? 'Zen'
@@ -310,6 +408,8 @@ function App() {
 				timerText={timerText}
 				guessesLeftText={guessesLeftText}
 				secret={secret}
+				showCopyResults={isDailyChallenge && isSolved}
+				onCopyResults={() => void copyDailyResults()}
 				onClearCurrentGuess={clearCurrentGuess}
 				onSubmitGuess={submitGuess}
 				onSetPeg={setPeg}
@@ -319,15 +419,17 @@ function App() {
 			<GuessHistory guesses={guesses} paletteById={activePaletteById} />
 
 			<div className="gameActions">
-				<button
-					type="button"
-					className="giveUpButton"
-					onClick={giveUp}
-					disabled={!canInteract}
-					title="End the game and reveal the secret"
-				>
-					Give up
-				</button>
+				{!isDailyChallenge ? (
+					<button
+						type="button"
+						className="giveUpButton"
+						onClick={giveUp}
+						disabled={!canInteract}
+						title="End the game and reveal the secret"
+					>
+						Give up
+					</button>
+				) : null}
 			</div>
 		</div>
 	);
