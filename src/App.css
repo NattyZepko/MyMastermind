@@ -298,6 +298,7 @@ button.secondary {
 	border: 2px solid rgba(255, 255, 255, 0.2);
 	padding: 1rem;
 	cursor: pointer;
+	-webkit-tap-highlight-color: transparent;
 }
 
 .swatch.selected {
@@ -349,6 +350,7 @@ button.secondary {
 	background: rgba(255, 255, 255, 0.03);
 	padding: 1rem;
 	cursor: inherit;
+	-webkit-tap-highlight-color: transparent;
 	box-shadow:
 		0 14px 28px rgba(196, 210, 125, 0.2),
 		0 0 0 4px rgba(199, 195, 87, 0.14),
