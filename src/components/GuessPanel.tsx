@@ -78,7 +78,9 @@ export function GuessPanel({
 			<div
 				className="pegs"
 				aria-label="Guess row"
-				style={{ gridTemplateColumns: `repeat(${codeLength}, 2.5rem)` }}
+				style={{
+					gridTemplateColumns: `repeat(${codeLength}, var(--peg-size))`,
+				}}
 			>
 				{currentGuess.map((colorId, i) => {
 					const color = colorId ? paletteById.get(colorId) : null;

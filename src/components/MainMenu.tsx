@@ -442,10 +442,7 @@ export function MainMenu({
 					</label>
 				</div>
 
-				<div className="menuActions">
-					<button type="button" onClick={onPlay} className="playButton">
-						Play
-					</button>
+				<div className="modeFooter">
 					<button
 						type="button"
 						onClick={onDailyChallenge}
@@ -454,6 +451,11 @@ export function MainMenu({
 					>
 						Daily challenge
 					</button>
+					<div className="menuActions">
+						<button type="button" onClick={onPlay} className="playButton">
+							Play
+						</button>
+					</div>
 				</div>
 			</section>
 

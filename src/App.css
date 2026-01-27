@@ -1,9 +1,31 @@
 .app {
+	--swatch-size: 3rem;
+	--peg-size: 3rem;
+	--tile-pad: 1rem;
+	--tile-radius: 13px;
+	--palette-gap: 0.6rem;
+	--peg-gap: 0.65rem;
+	--secret-gap: 0.5rem;
+
 	max-width: 980px;
 	margin: 0 auto;
 	padding: 2rem 1rem 3rem;
 	display: grid;
 	gap: 1rem;
+}
+
+.app.dailyChallenge {
+	/* Daily Challenge shows more UI (8 pegs + 14 colors) */
+	--swatch-size: 2.4rem;
+	--peg-size: 2.35rem;
+	--tile-pad: 0.55rem;
+	--palette-gap: 0.45rem;
+	--peg-gap: 0.45rem;
+	--secret-gap: 0.45rem;
+}
+
+.app.dailyChallenge .panel {
+	padding: 0.85rem;
 }
 
 .confetti {
@@ -360,16 +382,16 @@ button.secondary {
 .palette {
 	display: flex;
 	flex-wrap: wrap;
-	gap: 0.6rem;
+	gap: var(--palette-gap);
 	font-size: 3rem;
 }
 
 .swatch {
-	width: 3rem;
-	height: 3rem;
-	border-radius: 13px;
+	width: var(--swatch-size);
+	height: var(--swatch-size);
+	border-radius: var(--tile-radius);
 	border: 2px solid rgba(255, 255, 255, 0.2);
-	padding: 1rem;
+	padding: var(--tile-pad);
 	cursor: pointer;
 	-webkit-tap-highlight-color: transparent;
 }
@@ -412,16 +434,16 @@ button.secondary {
 
 .pegs {
 	display: grid;
-	gap: 0.65rem;
+	gap: var(--peg-gap);
 }
 
 .peg {
-	width: 3rem;
-	height: 3rem;
-	border-radius: 13px;
+	width: var(--peg-size);
+	height: var(--peg-size);
+	border-radius: var(--tile-radius);
 	border: 2px solid rgba(255, 255, 255, 0.2);
 	background: rgba(255, 255, 255, 0.03);
-	padding: 1rem;
+	padding: var(--tile-pad);
 	cursor: inherit;
 	-webkit-tap-highlight-color: transparent;
 	box-shadow:
@@ -438,7 +460,7 @@ button.secondary {
 .secretReveal {
 	margin-top: 0.75rem;
 	display: inline-flex;
-	gap: 0.5rem;
+	gap: var(--secret-gap);
 }
 
 .secretActions {
@@ -446,9 +468,9 @@ button.secondary {
 }
 
 .secretPeg {
-	width: 3rem;
-	height: 3rem;
-	border-radius: 13px;
+	width: var(--peg-size);
+	height: var(--peg-size);
+	border-radius: var(--tile-radius);
 	border: 2px solid rgba(255, 255, 255, 0.25);
 	background: rgba(255, 255, 255, 0.03);
 	display: inline-block;
@@ -512,6 +534,7 @@ button.secondary {
 	padding: 0.55rem 0.7rem;
 	background: var(--input);
 	color: inherit;
+	font-size: large;
 }
 
 .numberInput.compact {
@@ -617,6 +640,20 @@ button.secondary {
 		padding: 1.25rem 0.75rem 2rem;
 	}
 
+	.app.dailyChallenge {
+		padding: 1.05rem 0.65rem 1.6rem;
+		--swatch-size: 2.2rem;
+		--peg-size: 2.1rem;
+		--tile-pad: 0.45rem;
+		--palette-gap: 0.4rem;
+		--peg-gap: 0.4rem;
+		--secret-gap: 0.4rem;
+	}
+
+	.app.dailyChallenge .panel {
+		padding: 0.75rem;
+	}
+
 	.header {
 		flex-wrap: wrap;
 	}
@@ -638,14 +675,6 @@ button.secondary {
 		font-size: 2.25rem;
 	}
 
-	.swatch,
-	.peg,
-	.secretPeg {
-		width: 2.6rem;
-		height: 2.6rem;
-		padding: 0.6rem;
-	}
-
 	.radioRow {
 		grid-template-columns: auto 1fr;
 	}
@@ -655,6 +684,17 @@ button.secondary {
 		justify-content: flex-start;
 		flex-wrap: wrap;
 		white-space: normal;
+	}
+}
+
+@media (max-width: 390px) {
+	.app.dailyChallenge {
+		--swatch-size: 2.05rem;
+		--peg-size: 1.95rem;
+		--tile-pad: 0.4rem;
+		--peg-gap: 0.35rem;
+		--palette-gap: 0.35rem;
+		--secret-gap: 0.35rem;
 	}
 }
 
@@ -673,11 +713,19 @@ button.secondary {
 	gap: 0.5rem;
 }
 
-.menuActions {
+.modeFooter {
 	margin-top: 1rem;
+	display: flex;
+	align-items: center;
+	gap: 0.75rem;
+	flex-wrap: wrap;
+}
+
+.menuActions {
 	display: flex;
 	justify-content: flex-end;
 	gap: 0.75rem;
+	margin-left: auto;
 }
 
 .playButton {

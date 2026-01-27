@@ -22,6 +22,8 @@ type Screen = 'menu' | 'game';
 function App() {
 	const [screen, setScreen] = useState<Screen>('menu');
 	const [settings, setSettings] = useState<GameSettings>(DEFAULT_SETTINGS);
+	const [menuSettingsBeforeChallenge, setMenuSettingsBeforeChallenge] =
+		useState<GameSettings | null>(null);
 	const [isDailyChallenge, setIsDailyChallenge] = useState(false);
 	const [dailySeed, setDailySeed] = useState<string | null>(null);
 
@@ -145,6 +147,7 @@ function App() {
 	}
 
 	function onPlayFromMenu() {
+		setMenuSettingsBeforeChallenge(null);
 		const next = normalizeSettings(settings);
 		setSettings(next);
 		const palette = PALETTE.slice(0, next.paletteSize);
@@ -167,6 +170,7 @@ function App() {
 	}
 
 	function onDailyChallengeFromMenu() {
+		setMenuSettingsBeforeChallenge(settings);
 		const seed = utcDateKey();
 		const next: GameSettings = {
 			...settings,
@@ -360,19 +364,20 @@ function App() {
 	}
 
 	return (
-		<div className="app" style={cursor ? { cursor } : undefined}>
+		<div
+			className={`app${isDailyChallenge ? ' dailyChallenge' : ''}`}
+			style={cursor ? { cursor } : undefined}
+		>
 			{screen === 'game' && isSolved ? <ConfettiOverlay /> : null}
 			<Header
 				codeLength={normalizedSettings.codeLength}
 				onNewGame={isDailyChallenge ? undefined : startNewGame}
 				onBackToMenu={() => {
 					setScreen('menu');
-					setSettings((prev) =>
-						normalizeSettings({
-							...prev,
-							codeLength: Math.min(prev.codeLength, 6),
-						}),
-					);
+					if (isDailyChallenge && menuSettingsBeforeChallenge) {
+						setSettings(menuSettingsBeforeChallenge);
+						setMenuSettingsBeforeChallenge(null);
+					}
 					setIsDailyChallenge(false);
 					setDailySeed(null);
 					setGaveUp(false);
