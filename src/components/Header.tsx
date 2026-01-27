@@ -1,3 +1,5 @@
+import { RainbowTitle } from './RainbowTitle';
+
 type HeaderProps = {
 	codeLength: number;
 	subtitle?: string;
@@ -14,7 +16,9 @@ export function Header({
 	return (
 		<header className="header">
 			<div>
-				<h1 className="title">Mastermind</h1>
+				<h1 className="title titleGlow">
+					<RainbowTitle text="Mastermind" />
+				</h1>
 				<p className="subtitle">
 					{subtitle ??
 						`Guess the hidden ${codeLength}-color code (duplicates allowed).`}

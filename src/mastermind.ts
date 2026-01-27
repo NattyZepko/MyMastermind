@@ -3,11 +3,6 @@ export type Score = {
 	correctColorWrongPlace: number;
 };
 
-// Flip this to `true` temporarily if you want to inspect the random byte values
-// being generated (helpful when debugging in a browser without VS Code attachment).
-const DEBUG_RANDOM = false;
-let debugRandomLogsLeft = 20;
-
 function cryptoRandomInt(maxExclusive: number): number {
 	// Returns a uniformly random integer in the range [0, maxExclusive).
 	//
@@ -21,26 +16,10 @@ function cryptoRandomInt(maxExclusive: number): number {
 		throw new Error('maxExclusive must be a positive integer');
 	}
 	const bytes = new Uint8Array(1);
-	// `limit` is the largest multiple of maxExclusive less than 256.
-	// We accept only values < limit so that `v % maxExclusive` is perfectly uniform.
-	// maxExclusive = 4 => 256 % maxExclusive = 0 => limit = 256
-	// maxExclusive = 5 => 256 % maxExclusive = 1 => limit = 255
-	// maxExclusive = 6 => 256 % maxExclusive = 1 => limit = 255
-	// ...
 	const limit = 256 - (256 % maxExclusive);
 	while (true) {
 		crypto.getRandomValues(bytes);
-		alert(bytes[0]);
-		console.debug(bytes[0]);
-
 		const v = bytes[0];
-		if (DEBUG_RANDOM && debugRandomLogsLeft > 0) {
-			debugRandomLogsLeft--;
-			// Example: "cryptoRandomInt: v=203 limit=255 maxExclusive=6"
-			console.debug(
-				`cryptoRandomInt: v=${v} limit=${limit} maxExclusive=${maxExclusive}`,
-			);
-		}
 		// If v is in the "leftover" range [limit, 255], discard it and try again.
 		// This keeps the distribution uniform even when maxExclusive doesn't divide 256.
 		if (v < limit) return v % maxExclusive;
@@ -65,8 +44,6 @@ export function generateSecret(
 		// Fast path: duplicates are allowed.
 		// We generate `length` random bytes and map each byte to a palette index.
 		// For typical palette sizes (6–14) this is simple and plenty random.
-		// (If you wanted to be extremely strict about uniformity here too, you could
-		// use cryptoRandomInt(palette.length) for each pick, but the bias is tiny.)
 		const bytes = new Uint8Array(length);
 		crypto.getRandomValues(bytes);
 		return Array.from(bytes, (b) => palette[b % palette.length]);

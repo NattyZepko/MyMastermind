@@ -55,11 +55,21 @@ button {
 	background-color: rgba(255, 255, 255, 0.08);
 	cursor: pointer;
 	transition: border-color 0.25s;
+	-webkit-tap-highlight-color: transparent;
+	touch-action: manipulation;
+	user-select: none;
 }
-button:hover {
-	border-color: #646cff;
+
+@media (hover: hover) and (pointer: fine) {
+	button:hover {
+		border-color: #646cff;
+	}
 }
-button:focus,
+
+button:focus {
+	outline: none;
+}
+
 button:focus-visible {
 	outline: 4px auto -webkit-focus-ring-color;
 }

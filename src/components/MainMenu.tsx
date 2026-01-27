@@ -1,4 +1,5 @@
-import { useCallback, useEffect, useRef } from 'react';
+import { useCallback, useEffect, useRef, useState } from 'react';
+import demoGif from '../assets/demo.gif';
 import type { GameMode, GameSettings } from '../game/config';
 import {
 	CODE_LENGTH_MAX,
@@ -10,6 +11,7 @@ import {
 	TIME_LIMIT_MINUTES_MAX,
 	TIME_LIMIT_MINUTES_MIN,
 } from '../game/config';
+import { RainbowTitle } from './RainbowTitle';
 
 type MainMenuProps = {
 	settings: GameSettings;
@@ -229,6 +231,8 @@ function StepperNumberInput({
 }
 
 export function MainMenu({ settings, onChange, onPlay }: MainMenuProps) {
+	const [rulesOpen, setRulesOpen] = useState(false);
+
 	function set<K extends keyof GameSettings>(key: K, value: GameSettings[K]) {
 		onChange({ ...settings, [key]: value });
 	}
@@ -255,7 +259,9 @@ export function MainMenu({ settings, onChange, onPlay }: MainMenuProps) {
 		<div className="menu">
 			<header className="menuHeader">
 				<div>
-					<h1 className="title">Mastermind</h1>
+					<h1 className="title titleGlow">
+						<RainbowTitle text="Mastermind" />
+					</h1>
 					<p className="subtitle">
 						Set your difficulty, and select game mode. Press Play when ready.
 					</p>
@@ -424,6 +430,51 @@ export function MainMenu({ settings, onChange, onPlay }: MainMenuProps) {
 					<button type="button" onClick={onPlay} className="playButton">
 						Play
 					</button>
+				</div>
+			</section>
+
+			<section className="panel gameRules">
+				<button
+					type="button"
+					className="rulesTitleRow"
+					onClick={() => setRulesOpen((open) => !open)}
+					aria-expanded={rulesOpen}
+					aria-controls="gameRulesBody"
+					title={rulesOpen ? 'Hide rules' : 'Show rules'}
+				>
+					<div className="rulesLogo" aria-hidden="true">
+						<svg
+							viewBox="0 0 24 24"
+							role="img"
+							focusable="false"
+							aria-label="Help"
+						>
+							<path
+								fill="currentColor"
+								d="M12 2C6.477 2 2 6.477 2 12s4.477 10 10 10 10-4.477 10-10S17.523 2 12 2Zm0 18a8 8 0 1 1 0-16 8 8 0 0 1 0 16Zm0-4.5a1.25 1.25 0 1 0 0 2.5 1.25 1.25 0 0 0 0-2.5Zm0-11c-1.77 0-3.25 1.23-3.25 3a1 1 0 1 0 2 0c0-.58.6-1 1.25-1 .7 0 1.25.47 1.25 1 0 .5-.28.8-.93 1.21-.95.6-1.82 1.33-1.82 2.79V12a1 1 0 1 0 2 0v-.5c0-.42.16-.63.89-1.1.98-.62 1.86-1.41 1.86-2.9 0-1.72-1.46-3-3.25-3Z"
+							/>
+						</svg>
+					</div>
+					<h2 className="h2">How to play</h2>
+					<span className="rulesChevron" aria-hidden="true">
+						▼
+					</span>
+				</button>
+				<div id="gameRulesBody" className="rulesBody" hidden={!rulesOpen}>
+					<p>
+						A secret color code is waiting to be revealed, and you have to
+						figure it out by guessing. After each attempt, you receive feedback
+						indicating how many colors are correct and in the right place and
+						how many are correct but in the wrong place. Keep guessing until the
+						code is cracked!
+					</p>
+					<img
+						src={demoGif}
+						className="rulesDemoGif"
+						alt="Gameplay demo"
+						loading="lazy"
+						decoding="async"
+					/>
 				</div>
 			</section>
 		</div>
