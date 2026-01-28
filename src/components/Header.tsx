@@ -23,7 +23,7 @@ export function Header({
 		<header className="header">
 			<div>
 				<h1 className="title titleGlow">
-					<RainbowTitle text="Mastermind" />
+					<RainbowTitle text="Natty Mastermind" />
 				</h1>
 				<p className="subtitle">
 					{subtitle ??

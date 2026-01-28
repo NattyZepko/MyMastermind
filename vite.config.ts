@@ -8,4 +8,9 @@ export default defineConfig(({ mode }) => ({
 	// - root domains (e.g. https://nattymastermind.com/)
 	// - subpaths (e.g. https://<user>.github.io/<repo>/)
 	base: mode === 'production' ? './' : '/',
+	test: {
+		environment: 'jsdom',
+		setupFiles: ['./src/test/setup.ts'],
+		css: true,
+	},
 }));

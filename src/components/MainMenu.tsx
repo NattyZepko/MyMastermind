@@ -267,7 +267,7 @@ export function MainMenu({
 			<header className="menuHeader">
 				<div>
 					<h1 className="title titleGlow">
-						<RainbowTitle text="Mastermind" />
+						<RainbowTitle text="Natty Mastermind" />
 					</h1>
 					<p className="subtitle">
 						Set your difficulty, and select game mode. Press Play when ready.
