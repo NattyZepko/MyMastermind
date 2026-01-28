@@ -1,27 +1,19 @@
-﻿# Mastermind (Vite + React + TypeScript)
+﻿# Natty Mastermind (Vite + React + TypeScript)
 
-Client-side single page application for a Mastermind-style game using **colors**.
-
+A client-side single page application for a Mastermind-style game using **colors** — featuring a **Daily Challenge** and fully customizable games.
 <img width="1085" height="861" alt="image" src="https://github.com/user-attachments/assets/09a8b746-8053-4321-b6d5-0a909037720b" />
-
 
 ## Key files (start here)
 
 These are the most important files to understand the project quickly:
 
-- App entry point (mounts React): https://github.com/NattyZepko/MyMastermind/blob/main/src/main.tsx
-- App state + game flow (menu → game, input handling, limits, submit): https://github.com/NattyZepko/MyMastermind/blob/main/src/App.tsx
-- Core game logic (secret generation + scoring): https://github.com/NattyZepko/MyMastermind/blob/main/src/mastermind.ts
-
-- Settings + game modes (defaults, clamping, time formatting): https://github.com/NattyZepko/MyMastermind/blob/main/src/game/config.ts
-- Shared types for guesses/results: https://github.com/NattyZepko/MyMastermind/blob/main/src/game/types.ts
-
-- Palette definitions (the available colors): https://github.com/NattyZepko/MyMastermind/blob/main/src/game/palette.ts
-- Cursor helper (shows a colored cursor when a color is selected): https://github.com/NattyZepko/MyMastermind/blob/main/src/game/cursor.ts
-
-- Main menu UI (difficulty + mode selection): https://github.com/NattyZepko/MyMastermind/blob/main/src/components/MainMenu.tsx
-- Guess input row UI (placing/clearing pegs, submit): https://github.com/NattyZepko/MyMastermind/blob/main/src/components/GuessPanel.tsx
-- Guess history UI (previous guesses + feedback): https://github.com/NattyZepko/MyMastermind/blob/main/src/components/GuessHistory.tsx
+- App entry point (mounts React): [src/main.tsx](src/main.tsx)
+- App state + game flow (menu → game, Daily Challenge, limits, submit): [src/App.tsx](src/App.tsx)
+- Core game logic (secret generation + scoring): [src/mastermind.ts](src/mastermind.ts)
+- Settings + modes (defaults, clamping, clock formatting): [src/game/config.ts](src/game/config.ts)
+- Main menu (difficulty + mode selection + steppers): [src/components/MainMenu.tsx](src/components/MainMenu.tsx)
+- Palette UI: [src/components/PalettePanel.tsx](src/components/PalettePanel.tsx)
+- Guess row UI: [src/components/GuessPanel.tsx](src/components/GuessPanel.tsx)
 
 ## Tech stack
 
@@ -33,13 +25,17 @@ These are the most important files to understand the project quickly:
 
 ## Features
 
+- Daily Challenge (one shared puzzle per day)
 - Configurable difficulty (code length, palette size, duplicates)
 - Multiple modes:
   - **Zen** (no limits)
   - **Time** (solve before the timer runs out)
   - **Limited guesses** (solve before running out of guesses)
+- Mobile-friendly steppers (supports long-press / press-and-hold)
 - Mouse-friendly controls + keyboard submit (**Enter**)
-- History of guesses + feedback badges
+- Guess history + scoring badges
+- Secret reveal when the game ends, and “Copy results” for Daily Challenge
+- Social link previews (Open Graph / Twitter Cards)
 
 ## Overall system design
 
@@ -60,10 +56,15 @@ At a high level, the app is a single React tree that keeps the entire game state
 - `src/App.tsx`: top-level state machine (menu vs game), state storage, timing/limits, submit handler.
 - `src/mastermind.ts`:
   - `generateSecret(...)` uses the Web Crypto API for randomness.
+  - `generateSecretSeeded(...)` generates deterministic secrets (used for the Daily Challenge).
   - `scoreGuess(secret, guess)` calculates the two feedback counts.
 - `src/game/config.ts`: settings types, defaults, clamping/normalization, clock formatting.
 - `src/game/palette.ts`: color palette definitions.
 - `src/components/*`: UI components (menu, palette, guess row, history, header, confetti overlay).
+
+### Daily Challenge
+
+The Daily Challenge uses a deterministic seed based on the current **UTC date** (so everyone gets the same puzzle that day). The secret is generated with `generateSecretSeeded(...)`.
 
 ## How the game works
 
@@ -71,7 +72,7 @@ At a high level, the app is a single React tree that keeps the entire game state
 
 - The game generates a hidden **secret code** (a sequence of colors).
 - You choose the difficulty on the main menu:
-  - **Colors in secret** = code length (min 3, max 6)
+  - **Colors in secret** = code length (min 3; menu UI caps at 6, Daily Challenge uses 8)
   - **Palette size** = number of available colors (min 6, max 14)
   - **Allow duplicates** = whether the secret may repeat colors
 - You can guess duplicates even if the secret is unique.
@@ -82,6 +83,15 @@ At a high level, the app is a single React tree that keeps the entire game state
 - Click a slot in the guess row to place the selected color.
 - Right-click a slot to clear it.
 - Press **Guess** (or **Enter**) to submit.
+
+![Gameplay demo: selecting colors and filling pegs](src/assets/demo.gif)
+
+### Game end states
+
+- **Solved**: you matched the full secret.
+- **Time mode**: the game ends when time hits 0.
+- **Limited guesses**: the game ends when you run out of guesses.
+- **Give up**: available for non-daily games (reveals the secret).
 
 ### Feedback (scoring)
 
@@ -100,12 +110,27 @@ You solve the puzzle when **right color, right place = code length**.
 
 <img width="1059" height="869" alt="image" src="https://github.com/user-attachments/assets/71e6cbcd-97cb-4cd0-9dd2-01c8f628e9ec" />
 
-
 ## Run locally
 
 ```bash
 npm install
 npm run dev
+```
+
+## Tests
+
+```bash
+npm run test
+```
+
+```bash
+npm run test:run
+```
+
+## Lint
+
+```bash
+npm run lint
 ```
 
 ## Build
@@ -114,6 +139,15 @@ npm run dev
 npm run build
 npm run preview
 ```
+
+## Deployment
+
+- GitHub Pages deploy workflow: .github/workflows/deploy-pages.yml
+- Vite base is configured to be portable across root domains and subpaths (`base: './'` in production).
+
+## Social previews (WhatsApp/Facebook/etc)
+
+The project includes Open Graph / Twitter Card metadata in index.html, and a share image at public/og-image.svg.
 
 ## Sources / references
 
@@ -128,3 +162,7 @@ These are the main references used while building this project:
 Assets:
 
 - Custom favicon/logo is an SVG in `public/favicon.svg`.
+
+Analytics:
+
+- Google Analytics tag is included in index.html.
