@@ -2,6 +2,9 @@
 
 Client-side single page application for a Mastermind-style game using **colors**.
 
+<img width="1085" height="861" alt="image" src="https://github.com/user-attachments/assets/09a8b746-8053-4321-b6d5-0a909037720b" />
+
+
 ## Key files (start here)
 
 These are the most important files to understand the project quickly:
