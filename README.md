@@ -98,6 +98,9 @@ You solve the puzzle when **right color, right place = code length**.
 - **Time**: solve before time runs out.
 - **Limited guesses**: solve before you run out of guesses.
 
+<img width="1059" height="869" alt="image" src="https://github.com/user-attachments/assets/71e6cbcd-97cb-4cd0-9dd2-01c8f628e9ec" />
+
+
 ## Run locally
 
 ```bash
