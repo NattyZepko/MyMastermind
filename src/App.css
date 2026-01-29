@@ -410,9 +410,10 @@ button.secondary {
 .swatch {
 	width: var(--swatch-size);
 	height: var(--swatch-size);
+	box-sizing: border-box;
 	border-radius: var(--tile-radius);
 	border: 2px solid rgba(255, 255, 255, 0.2);
-	padding: var(--tile-pad);
+	padding: 0;
 	cursor: grab;
 	-webkit-tap-highlight-color: transparent;
 }
@@ -465,10 +466,11 @@ button.secondary {
 .peg {
 	width: var(--peg-size);
 	height: var(--peg-size);
+	box-sizing: border-box;
 	border-radius: var(--tile-radius);
 	border: 2px solid rgba(255, 255, 255, 0.2);
 	background: rgba(255, 255, 255, 0.03);
-	padding: var(--tile-pad);
+	padding: 0;
 	cursor: inherit;
 	-webkit-tap-highlight-color: transparent;
 	box-shadow:
@@ -500,6 +502,7 @@ button.secondary {
 .secretPeg {
 	width: var(--peg-size);
 	height: var(--peg-size);
+	box-sizing: border-box;
 	border-radius: var(--tile-radius);
 	border: 2px solid rgba(255, 255, 255, 0.25);
 	background: rgba(255, 255, 255, 0.03);

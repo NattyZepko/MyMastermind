@@ -36,6 +36,7 @@ body {
 	min-height: 100vh;
 	background: var(--bg);
 	overscroll-behavior-y: none;
+	overflow-x: hidden;
 }
 
 html {
@@ -44,6 +45,7 @@ html {
 
 #root {
 	min-height: 100vh;
+	overflow-x: hidden;
 }
 
 h1 {
