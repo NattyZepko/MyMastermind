@@ -32,8 +32,11 @@ These are the most important files to understand the project quickly:
   - **Time** (solve before the timer runs out)
   - **Limited guesses** (solve before running out of guesses)
 - Mobile-friendly steppers (supports long-press / press-and-hold)
-- Mouse-friendly controls + keyboard submit (**Enter**)
-- Guess history + scoring badges
+- Fast controls:
+  - Click-to-place and right-click-to-clear pegs
+  - Drag & drop from the palette to the guess row (desktop + mobile)
+  - Drag from peg → peg to copy colors within the current guess (non-empty pegs only)
+- Guess history + scoring badges (click a previous guess to refill the current guess row)
 - Secret reveal when the game ends, and “Copy results” for Daily Challenge
 - Social link previews (Open Graph / Twitter Cards)
 
@@ -66,6 +69,15 @@ At a high level, the app is a single React tree that keeps the entire game state
 
 The Daily Challenge uses a deterministic seed based on the current **UTC date** (so everyone gets the same puzzle that day). The secret is generated with `generateSecretSeeded(...)`.
 
+Daily Challenge is intentionally a fixed ruleset:
+
+- Mode: **Zen**
+- Code length: **8**
+- Palette size: **14**
+- Duplicates: **allowed**
+- “Give up” is disabled
+- Win screen includes a **Copy results** button
+
 ## How the game works
 
 ### Rules
@@ -82,6 +94,9 @@ The Daily Challenge uses a deterministic seed based on the current **UTC date** 
 - Click a color in the palette to select it.
 - Click a slot in the guess row to place the selected color.
 - Right-click a slot to clear it.
+- Drag & drop a color onto a slot (desktop), or touch-drag on mobile.
+- Drag from one filled peg to another to copy that color (acts like dragging from the palette; empty pegs can’t be dragged).
+- Click a row in **Guesses** to refill your current guess with that previous guess.
 - Press **Guess** (or **Enter**) to submit.
 
 ![Gameplay demo: selecting colors and filling pegs](src/assets/demo.gif)
@@ -112,6 +127,8 @@ You solve the puzzle when **right color, right place = code length**.
 
 ## Run locally
 
+Requirements: Node.js 18+ (recommended 20+).
+
 ```bash
 npm install
 npm run dev
@@ -139,6 +156,11 @@ npm run lint
 npm run build
 npm run preview
 ```
+
+## Mobile notes
+
+- The app includes safeguards to reduce accidental refresh/reset on mobile browsers (e.g. pull-to-refresh while playing).
+- Daily Challenge UI uses smaller tile sizes to fit 8 pegs + 14 colors on small screens.
 
 ## Deployment
 
