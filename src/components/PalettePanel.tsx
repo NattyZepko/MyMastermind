@@ -7,7 +7,12 @@ type PalettePanelProps = {
 	canInteract: boolean;
 	onStartTouchDrag?: (
 		colorId: string,
-		e: React.PointerEvent<HTMLButtonElement>,
+		start: {
+			kind: 'pointer' | 'touch';
+			id: number;
+			x: number;
+			y: number;
+		},
 	) => void;
 	suppressClick?: boolean;
 };
@@ -64,8 +69,28 @@ export function PalettePanel({
 							onPointerDown={(e) => {
 								if (!canInteract) return;
 								if (e.pointerType === 'mouse') return;
+								e.preventDefault();
+								e.currentTarget.setPointerCapture?.(e.pointerId);
 								onSelectColor(c.id);
-								onStartTouchDrag?.(c.id, e);
+								onStartTouchDrag?.(c.id, {
+									kind: 'pointer',
+									id: e.pointerId,
+									x: e.clientX,
+									y: e.clientY,
+								});
+							}}
+							onTouchStart={(e) => {
+								if (!canInteract) return;
+								const t = e.touches.item(0);
+								if (!t) return;
+								e.preventDefault();
+								onSelectColor(c.id);
+								onStartTouchDrag?.(c.id, {
+									kind: 'touch',
+									id: t.identifier,
+									x: t.clientX,
+									y: t.clientY,
+								});
 							}}
 							draggable
 							onDragStart={(e) => {

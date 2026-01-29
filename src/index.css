@@ -35,6 +35,11 @@ body {
 	min-width: 320px;
 	min-height: 100vh;
 	background: var(--bg);
+	overscroll-behavior-y: none;
+}
+
+html {
+	overscroll-behavior-y: none;
 }
 
 #root {

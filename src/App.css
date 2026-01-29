@@ -14,6 +14,12 @@
 	gap: 1rem;
 }
 
+.app.touchDragging {
+	touch-action: none;
+	overscroll-behavior: none;
+	user-select: none;
+}
+
 .app.dailyChallenge {
 	/* Daily Challenge shows more UI (8 pegs + 14 colors) */
 	--swatch-size: 2.4rem;

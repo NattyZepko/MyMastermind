@@ -1,4 +1,4 @@
-import { useCallback, useEffect, useMemo, useState } from 'react';
+import { useCallback, useEffect, useMemo, useRef, useState } from 'react';
 import './App.css';
 import { ConfettiOverlay } from './components/ConfettiOverlay';
 import { GuessHistory } from './components/GuessHistory';
@@ -13,7 +13,7 @@ import {
 	type GameSettings,
 } from './game/config';
 import { cssCursorFor } from './game/cursor';
-import { PALETTE } from './game/palette';
+import { PALETTE, type PaletteColor } from './game/palette';
 import type { GuessResult } from './game/types';
 import { generateSecret, generateSecretSeeded, scoreGuess } from './mastermind';
 
@@ -35,24 +35,22 @@ function App() {
 		() => PALETTE.slice(0, normalizedSettings.paletteSize),
 		[normalizedSettings.paletteSize],
 	);
-	const activePaletteById = useMemo(
-		() => new Map(activePalette.map((c) => [c.id, c] as const)),
-		[activePalette],
-	);
+	const activePaletteById = useMemo(() => {
+		return new Map<string, PaletteColor>(activePalette.map((c) => [c.id, c]));
+	}, [activePalette]);
 
 	const [secret, setSecret] = useState<string[]>([]);
 	const [selectedColorId, setSelectedColorId] = useState<string | null>(null);
-	const [currentGuess, setCurrentGuess] = useState<Array<string | null>>(() =>
-		Array.from({ length: normalizedSettings.codeLength }, () => null),
-	);
+	const [currentGuess, setCurrentGuess] = useState<Array<string | null>>([]);
 	const [guesses, setGuesses] = useState<GuessResult[]>([]);
 	const [error, setError] = useState<string | null>(null);
 	const [gameStartMs, setGameStartMs] = useState<number | null>(null);
 	const [nowMs, setNowMs] = useState<number>(() => Date.now());
 	const [gaveUp, setGaveUp] = useState(false);
 
-	const [touchDrag, setTouchDrag] = useState<{
-		pointerId: number;
+	type TouchDragSession = {
+		kind: 'pointer' | 'touch';
+		id: number;
 		colorId: string;
 		startX: number;
 		startY: number;
@@ -60,7 +58,9 @@ function App() {
 		y: number;
 		started: boolean;
 		overPegIndex: number | null;
-	} | null>(null);
+	};
+
+	const [touchDrag, setTouchDrag] = useState<TouchDragSession | null>(null);
 
 	const solvedAt = useMemo(() => {
 		const index = guesses.findIndex(
@@ -114,6 +114,81 @@ function App() {
 
 	const isGameOver =
 		screen === 'game' && (isSolved || gaveUp || isTimeUp || isOutOfGuesses);
+
+	// On mobile Chrome, a downward swipe at scroll top can trigger pull-to-refresh.
+	// That refresh resets the game, so we suppress that gesture while playing.
+	const pullToRefreshTouchIdRef = useRef<number | null>(null);
+	const pullToRefreshStartYRef = useRef<number | null>(null);
+
+	useEffect(() => {
+		if (screen !== 'game') return;
+
+		function isEditableTarget(target: EventTarget | null) {
+			const el = target as HTMLElement | null;
+			if (!el) return false;
+			const tag = el.tagName;
+			return (
+				tag === 'INPUT' ||
+				tag === 'TEXTAREA' ||
+				(el as HTMLElement).isContentEditable
+			);
+		}
+
+		function onTouchStart(ev: TouchEvent) {
+			if (isEditableTarget(ev.target)) {
+				pullToRefreshTouchIdRef.current = null;
+				pullToRefreshStartYRef.current = null;
+				return;
+			}
+			const t = ev.touches.item(0);
+			if (!t) return;
+			// Only track if we're already at the top of the page.
+			if (window.scrollY !== 0) {
+				pullToRefreshTouchIdRef.current = null;
+				pullToRefreshStartYRef.current = null;
+				return;
+			}
+			pullToRefreshTouchIdRef.current = t.identifier;
+			pullToRefreshStartYRef.current = t.clientY;
+		}
+
+		function findTouch(touches: TouchList, id: number) {
+			for (let i = 0; i < touches.length; i++) {
+				const t = touches.item(i);
+				if (t && t.identifier === id) return t;
+			}
+			return null;
+		}
+
+		function onTouchMove(ev: TouchEvent) {
+			const id = pullToRefreshTouchIdRef.current;
+			const startY = pullToRefreshStartYRef.current;
+			if (id == null || startY == null) return;
+			if (window.scrollY !== 0) return;
+			const t = findTouch(ev.touches, id);
+			if (!t) return;
+			// Only block once the user is clearly pulling down.
+			if (t.clientY - startY > 6) {
+				ev.preventDefault();
+			}
+		}
+
+		function clear() {
+			pullToRefreshTouchIdRef.current = null;
+			pullToRefreshStartYRef.current = null;
+		}
+
+		window.addEventListener('touchstart', onTouchStart, { passive: true });
+		window.addEventListener('touchmove', onTouchMove, { passive: false });
+		window.addEventListener('touchend', clear);
+		window.addEventListener('touchcancel', clear);
+		return () => {
+			window.removeEventListener('touchstart', onTouchStart);
+			window.removeEventListener('touchmove', onTouchMove);
+			window.removeEventListener('touchend', clear);
+			window.removeEventListener('touchcancel', clear);
+		};
+	}, [screen]);
 
 	function utcDateKey(d = new Date()) {
 		return d.toISOString().slice(0, 10);
@@ -283,16 +358,24 @@ function App() {
 	);
 
 	const startTouchDrag = useCallback(
-		(colorId: string, e: React.PointerEvent<HTMLButtonElement>) => {
+		(
+			colorId: string,
+			start: {
+				kind: 'pointer' | 'touch';
+				id: number;
+				x: number;
+				y: number;
+			},
+		) => {
 			if (!canInteract) return;
-			if (e.pointerType === 'mouse') return;
 			setTouchDrag({
-				pointerId: e.pointerId,
+				kind: start.kind,
+				id: start.id,
 				colorId,
-				startX: e.clientX,
-				startY: e.clientY,
-				x: e.clientX,
-				y: e.clientY,
+				startX: start.x,
+				startY: start.y,
+				x: start.x,
+				y: start.y,
 				started: false,
 				overPegIndex: null,
 			});
@@ -302,7 +385,8 @@ function App() {
 
 	useEffect(() => {
 		if (!touchDrag) return;
-		const sessionPointerId = touchDrag.pointerId;
+		const sessionKind = touchDrag.kind;
+		const sessionId = touchDrag.id;
 		const startX = touchDrag.startX;
 		const startY = touchDrag.startY;
 
@@ -319,34 +403,24 @@ function App() {
 			return parsed;
 		}
 
-		function onPointerMove(ev: PointerEvent) {
-			if (ev.pointerId !== sessionPointerId) return;
-			const dx0 = ev.clientX - startX;
-			const dy0 = ev.clientY - startY;
-			const willStart = dx0 * dx0 + dy0 * dy0 >= thresholdSq;
+		function update(x: number, y: number) {
 			setTouchDrag((prev) => {
 				if (!prev) return prev;
-				const dx = ev.clientX - prev.startX;
-				const dy = ev.clientY - prev.startY;
+				const dx = x - prev.startX;
+				const dy = y - prev.startY;
 				const started = prev.started || dx * dx + dy * dy >= thresholdSq;
-				const overPegIndex = started
-					? findPegIndexAtPoint(ev.clientX, ev.clientY)
-					: null;
-
+				const overPegIndex = started ? findPegIndexAtPoint(x, y) : null;
 				return {
 					...prev,
-					x: ev.clientX,
-					y: ev.clientY,
+					x,
+					y,
 					started,
 					overPegIndex,
 				};
 			});
-			// Prevent scrolling once the gesture becomes a drag
-			if (willStart) ev.preventDefault();
 		}
 
-		function finishDrag(ev: PointerEvent) {
-			if (ev.pointerId !== sessionPointerId) return;
+		function finish() {
 			setTouchDrag((prev) => {
 				if (prev?.started && prev.overPegIndex !== null) {
 					setPegColor(prev.overPegIndex, prev.colorId);
@@ -355,13 +429,62 @@ function App() {
 			});
 		}
 
-		window.addEventListener('pointermove', onPointerMove, { passive: false });
-		window.addEventListener('pointerup', finishDrag);
-		window.addEventListener('pointercancel', finishDrag);
+		if (sessionKind === 'pointer') {
+			function onPointerMove(ev: PointerEvent) {
+				if (ev.pointerId !== sessionId) return;
+				const dx0 = ev.clientX - startX;
+				const dy0 = ev.clientY - startY;
+				const willStart = dx0 * dx0 + dy0 * dy0 >= thresholdSq;
+				update(ev.clientX, ev.clientY);
+				if (willStart) ev.preventDefault();
+			}
+
+			function finishPointer(ev: PointerEvent) {
+				if (ev.pointerId !== sessionId) return;
+				finish();
+			}
+
+			window.addEventListener('pointermove', onPointerMove, { passive: false });
+			window.addEventListener('pointerup', finishPointer);
+			window.addEventListener('pointercancel', finishPointer);
+			return () => {
+				window.removeEventListener('pointermove', onPointerMove);
+				window.removeEventListener('pointerup', finishPointer);
+				window.removeEventListener('pointercancel', finishPointer);
+			};
+		}
+
+		function findTouch(touches: TouchList, identifier: number): Touch | null {
+			for (let i = 0; i < touches.length; i++) {
+				const t = touches.item(i);
+				if (t && t.identifier === identifier) return t;
+			}
+			return null;
+		}
+
+		function onTouchMove(ev: TouchEvent) {
+			const t = findTouch(ev.touches, sessionId);
+			if (!t) return;
+			const dx0 = t.clientX - startX;
+			const dy0 = t.clientY - startY;
+			const willStart = dx0 * dx0 + dy0 * dy0 >= thresholdSq;
+			update(t.clientX, t.clientY);
+			if (willStart) ev.preventDefault();
+		}
+
+		function finishTouch(ev: TouchEvent) {
+			const ended = findTouch(ev.changedTouches, sessionId);
+			if (!ended) return;
+			finish();
+		}
+
+		window.addEventListener('touchmove', onTouchMove, { passive: false });
+		window.addEventListener('touchend', finishTouch);
+		window.addEventListener('touchcancel', finishTouch);
 		return () => {
-			window.removeEventListener('pointermove', onPointerMove);
-			window.removeEventListener('pointerup', finishDrag);
-			window.removeEventListener('pointercancel', finishDrag);
+			window.removeEventListener('touchmove', onTouchMove);
+			window.removeEventListener('touchend', finishTouch);
+			window.removeEventListener('touchcancel', finishTouch);
 		};
 	}, [normalizedSettings.codeLength, setPegColor, touchDrag]);
 
@@ -472,7 +595,7 @@ function App() {
 
 	return (
 		<div
-			className={`app${isDailyChallenge ? ' dailyChallenge' : ''}`}
+			className={`app${isDailyChallenge ? ' dailyChallenge' : ''}${touchDrag?.started ? ' touchDragging' : ''}`}
 			style={cursor ? { cursor } : undefined}
 		>
 			{touchDrag?.started ? (
