@@ -34,6 +34,11 @@
 	padding: 0.85rem;
 }
 
+.app.dailyChallenge .digit {
+	width: var(--peg-size);
+	height: var(--peg-size);
+}
+
 .confetti {
 	position: fixed;
 	inset: 0;
@@ -254,7 +259,7 @@
 
 .historyItem {
 	display: grid;
-	grid-template-columns: 1fr auto;
+	grid-template-columns: minmax(0, 1fr) auto;
 	gap: 0.75rem;
 	align-items: center;
 	padding: 0.75rem;
@@ -264,7 +269,9 @@
 }
 
 .guessDigits {
-	display: inline-flex;
+	display: flex;
+	flex-wrap: wrap;
+	min-width: 0;
 	gap: 0.5rem;
 }
 
@@ -717,6 +724,15 @@ button.secondary {
 		justify-content: flex-start;
 		flex-wrap: wrap;
 		white-space: normal;
+	}
+
+	.historyItem {
+		grid-template-columns: 1fr;
+		align-items: start;
+	}
+
+	.result {
+		justify-content: flex-start;
 	}
 }
 
