@@ -14,6 +14,16 @@ type GuessPanelProps = {
 	showCopyResults?: boolean;
 	onCopyResults?: () => void;
 	externalDragOverIndex?: number | null;
+	onStartTouchDrag?: (
+		colorId: string,
+		start: {
+			kind: 'pointer' | 'touch';
+			id: number;
+			x: number;
+			y: number;
+		},
+	) => void;
+	suppressClick?: boolean;
 
 	onClearCurrentGuess: () => void;
 	onSubmitGuess: () => void;
@@ -35,6 +45,8 @@ export function GuessPanel({
 	showCopyResults,
 	onCopyResults,
 	externalDragOverIndex,
+	onStartTouchDrag,
+	suppressClick,
 	onClearCurrentGuess,
 	onSubmitGuess,
 	onSetPeg,
@@ -99,6 +111,11 @@ export function GuessPanel({
 			>
 				{currentGuess.map((colorId, i) => {
 					const color = colorId ? paletteById.get(colorId) : null;
+					const canDragThisPeg =
+						Boolean(colorId) &&
+						canInteract &&
+						Boolean(onSetPegColor) &&
+						Boolean(onStartTouchDrag);
 					return (
 						<button
 							key={i}
@@ -106,7 +123,50 @@ export function GuessPanel({
 							data-peg-index={i}
 							className={`peg${effectiveDragOverIndex === i ? ' dragOver' : ''}`}
 							style={{ background: color ? color.hex : 'transparent' }}
-							onClick={() => onSetPeg(i)}
+							onClick={(e) => {
+								if (suppressClick) {
+									e.preventDefault();
+									e.stopPropagation();
+									return;
+								}
+								onSetPeg(i);
+							}}
+							draggable={
+								Boolean(colorId) && canInteract && Boolean(onSetPegColor)
+							}
+							onDragStart={(e) => {
+								if (!colorId) return;
+								e.dataTransfer.effectAllowed = 'copy';
+								e.dataTransfer.setData(
+									'application/x-mastermind-color',
+									colorId,
+								);
+								e.dataTransfer.setData('text/plain', colorId);
+							}}
+							onPointerDown={(e) => {
+								if (!canDragThisPeg) return;
+								if (e.pointerType === 'mouse') return;
+								e.preventDefault();
+								e.currentTarget.setPointerCapture?.(e.pointerId);
+								onStartTouchDrag?.(colorId as string, {
+									kind: 'pointer',
+									id: e.pointerId,
+									x: e.clientX,
+									y: e.clientY,
+								});
+							}}
+							onTouchStart={(e) => {
+								if (!canDragThisPeg) return;
+								const t = e.touches.item(0);
+								if (!t) return;
+								e.preventDefault();
+								onStartTouchDrag?.(colorId as string, {
+									kind: 'touch',
+									id: t.identifier,
+									x: t.clientX,
+									y: t.clientY,
+								});
+							}}
 							onDragEnter={(e) => {
 								if (!canInteract) return;
 								if (!onSetPegColor) return;

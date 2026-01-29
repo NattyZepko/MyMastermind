@@ -4,9 +4,16 @@ import type { GuessResult } from '../game/types';
 type GuessHistoryProps = {
 	guesses: GuessResult[];
 	paletteById: ReadonlyMap<string, PaletteColor>;
+	canInteract?: boolean;
+	onSelectGuess?: (guess: string[]) => void;
 };
 
-export function GuessHistory({ guesses, paletteById }: GuessHistoryProps) {
+export function GuessHistory({
+	guesses,
+	paletteById,
+	canInteract,
+	onSelectGuess,
+}: GuessHistoryProps) {
 	return (
 		<section className="panel">
 			<div
@@ -40,29 +47,44 @@ export function GuessHistory({ guesses, paletteById }: GuessHistoryProps) {
 						.slice()
 						.reverse()
 						.map((g) => (
-							<li key={g.id} className="historyItem">
-								<div className="guessDigits" aria-label={`Guess ${g.id}`}>
-									{g.guess.map((id, i) => {
-										const c = paletteById.get(id);
-										return (
-											<span
-												key={`${g.id}-${i}`}
-												className="digit"
-												style={{ background: c?.hex ?? 'transparent' }}
-												title={c?.label ?? id}
-											/>
-										);
-									})}
-								</div>
+							<li key={g.id}>
+								<button
+									type="button"
+									className="historyItem"
+									onClick={() => onSelectGuess?.(g.guess)}
+									disabled={!canInteract || !onSelectGuess}
+									title={canInteract ? 'Use this guess' : 'Game is over'}
+									aria-label={`Use guess ${g.id}`}
+								>
+									<div className="guessDigits" aria-label={`Guess ${g.id}`}>
+										{g.guess.map((id, i) => {
+											const c = paletteById.get(id);
+											return (
+												<span
+													key={`${g.id}-${i}`}
+													className="digit"
+													style={{ background: c?.hex ?? 'transparent' }}
+													title={c?.label ?? id}
+												/>
+											);
+										})}
+									</div>
 
-								<div className="result">
-									<span className="badge good" title="Right color, right place">
-										{g.correctPlace}
-									</span>
-									<span className="badge warn" title="Right color, wrong place">
-										{g.correctColorWrongPlace}
-									</span>
-								</div>
+									<div className="result">
+										<span
+											className="badge good"
+											title="Right color, right place"
+										>
+											{g.correctPlace}
+										</span>
+										<span
+											className="badge warn"
+											title="Right color, wrong place"
+										>
+											{g.correctColorWrongPlace}
+										</span>
+									</div>
+								</button>
 							</li>
 						))}
 				</ol>

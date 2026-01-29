@@ -383,6 +383,24 @@ function App() {
 		[canInteract],
 	);
 
+	const startTouchDragFromPeg = useCallback(
+		(
+			colorId: string,
+			start: {
+				kind: 'pointer' | 'touch';
+				id: number;
+				x: number;
+				y: number;
+			},
+		) => {
+			if (!canInteract) return;
+			setSelectedColorId(colorId);
+			setError(null);
+			startTouchDrag(colorId, start);
+		},
+		[canInteract, startTouchDrag],
+	);
+
 	useEffect(() => {
 		if (!touchDrag) return;
 		const sessionKind = touchDrag.kind;
@@ -664,13 +682,24 @@ function App() {
 				onSubmitGuess={submitGuess}
 				onSetPeg={setPeg}
 				onSetPegColor={setPegColor}
+				onStartTouchDrag={startTouchDragFromPeg}
+				suppressClick={Boolean(touchDrag?.started)}
 				externalDragOverIndex={
 					touchDrag?.started ? touchDrag.overPegIndex : null
 				}
 				onClearPeg={clearPeg}
 			/>
 
-			<GuessHistory guesses={guesses} paletteById={activePaletteById} />
+			<GuessHistory
+				guesses={guesses}
+				paletteById={activePaletteById}
+				canInteract={canInteract}
+				onSelectGuess={(guess) => {
+					if (!canInteract) return;
+					setCurrentGuess(guess.slice(0, normalizedSettings.codeLength));
+					setError(null);
+				}}
+			/>
 
 			<div className="gameActions">
 				{!isDailyChallenge ? (
