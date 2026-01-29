@@ -51,6 +51,17 @@ function App() {
 	const [nowMs, setNowMs] = useState<number>(() => Date.now());
 	const [gaveUp, setGaveUp] = useState(false);
 
+	const [touchDrag, setTouchDrag] = useState<{
+		pointerId: number;
+		colorId: string;
+		startX: number;
+		startY: number;
+		x: number;
+		y: number;
+		started: boolean;
+		overPegIndex: number | null;
+	} | null>(null);
+
 	const solvedAt = useMemo(() => {
 		const index = guesses.findIndex(
 			(g) => g.correctPlace === normalizedSettings.codeLength,
@@ -211,7 +222,7 @@ function App() {
 	const copyDailyResults = useCallback(async () => {
 		if (!isDailyChallenge) return;
 		if (!isSolved || solvedAt === null) return;
-		const text = `I've beaten today's challenge at NattyMastermind.com in ${solvedAt} guesses! See if you can beat my score!`;
+		const text = `I've beaten today's challenge at https://nattymastermind.com/ in ${solvedAt} guesses! See if you can beat my score!`;
 		try {
 			await navigator.clipboard.writeText(text);
 		} catch {
@@ -257,6 +268,102 @@ function App() {
 		});
 		setError(null);
 	}
+
+	const setPegColor = useCallback(
+		(index: number, colorId: string) => {
+			if (!canInteract) return;
+			setCurrentGuess((prev) => {
+				const next = prev.slice();
+				next[index] = colorId;
+				return next;
+			});
+			setError(null);
+		},
+		[canInteract],
+	);
+
+	const startTouchDrag = useCallback(
+		(colorId: string, e: React.PointerEvent<HTMLButtonElement>) => {
+			if (!canInteract) return;
+			if (e.pointerType === 'mouse') return;
+			setTouchDrag({
+				pointerId: e.pointerId,
+				colorId,
+				startX: e.clientX,
+				startY: e.clientY,
+				x: e.clientX,
+				y: e.clientY,
+				started: false,
+				overPegIndex: null,
+			});
+		},
+		[canInteract],
+	);
+
+	useEffect(() => {
+		if (!touchDrag) return;
+		const sessionPointerId = touchDrag.pointerId;
+		const startX = touchDrag.startX;
+		const startY = touchDrag.startY;
+
+		const thresholdSq = 8 * 8;
+
+		function findPegIndexAtPoint(x: number, y: number) {
+			const el = document.elementFromPoint(x, y) as HTMLElement | null;
+			const peg = el?.closest?.('button[data-peg-index]') as HTMLElement | null;
+			const raw = peg?.getAttribute('data-peg-index');
+			if (raw == null) return null;
+			const parsed = Number(raw);
+			if (!Number.isInteger(parsed)) return null;
+			if (parsed < 0 || parsed >= normalizedSettings.codeLength) return null;
+			return parsed;
+		}
+
+		function onPointerMove(ev: PointerEvent) {
+			if (ev.pointerId !== sessionPointerId) return;
+			const dx0 = ev.clientX - startX;
+			const dy0 = ev.clientY - startY;
+			const willStart = dx0 * dx0 + dy0 * dy0 >= thresholdSq;
+			setTouchDrag((prev) => {
+				if (!prev) return prev;
+				const dx = ev.clientX - prev.startX;
+				const dy = ev.clientY - prev.startY;
+				const started = prev.started || dx * dx + dy * dy >= thresholdSq;
+				const overPegIndex = started
+					? findPegIndexAtPoint(ev.clientX, ev.clientY)
+					: null;
+
+				return {
+					...prev,
+					x: ev.clientX,
+					y: ev.clientY,
+					started,
+					overPegIndex,
+				};
+			});
+			// Prevent scrolling once the gesture becomes a drag
+			if (willStart) ev.preventDefault();
+		}
+
+		function finishDrag(ev: PointerEvent) {
+			if (ev.pointerId !== sessionPointerId) return;
+			setTouchDrag((prev) => {
+				if (prev?.started && prev.overPegIndex !== null) {
+					setPegColor(prev.overPegIndex, prev.colorId);
+				}
+				return null;
+			});
+		}
+
+		window.addEventListener('pointermove', onPointerMove, { passive: false });
+		window.addEventListener('pointerup', finishDrag);
+		window.addEventListener('pointercancel', finishDrag);
+		return () => {
+			window.removeEventListener('pointermove', onPointerMove);
+			window.removeEventListener('pointerup', finishDrag);
+			window.removeEventListener('pointercancel', finishDrag);
+		};
+	}, [normalizedSettings.codeLength, setPegColor, touchDrag]);
 
 	const submitGuess = useCallback(() => {
 		if (!canInteract) return;
@@ -368,6 +475,18 @@ function App() {
 			className={`app${isDailyChallenge ? ' dailyChallenge' : ''}`}
 			style={cursor ? { cursor } : undefined}
 		>
+			{touchDrag?.started ? (
+				<div
+					className="touchDragGhost"
+					aria-hidden="true"
+					style={{
+						left: touchDrag.x,
+						top: touchDrag.y,
+						background:
+							activePaletteById.get(touchDrag.colorId)?.hex ?? 'transparent',
+					}}
+				/>
+			) : null}
 			{screen === 'game' && isSolved ? <ConfettiOverlay /> : null}
 			<Header
 				codeLength={normalizedSettings.codeLength}
@@ -397,10 +516,13 @@ function App() {
 			<PalettePanel
 				palette={activePalette}
 				selectedColorId={selectedColorId}
+				canInteract={canInteract}
 				onSelectColor={(colorId) => {
 					setSelectedColorId(colorId);
 					setError(null);
 				}}
+				onStartTouchDrag={startTouchDrag}
+				suppressClick={Boolean(touchDrag?.started)}
 			/>
 
 			<GuessPanel
@@ -418,6 +540,10 @@ function App() {
 				onClearCurrentGuess={clearCurrentGuess}
 				onSubmitGuess={submitGuess}
 				onSetPeg={setPeg}
+				onSetPegColor={setPegColor}
+				externalDragOverIndex={
+					touchDrag?.started ? touchDrag.overPegIndex : null
+				}
 				onClearPeg={clearPeg}
 			/>
 

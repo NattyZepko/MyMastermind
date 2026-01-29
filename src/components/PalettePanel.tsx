@@ -4,12 +4,21 @@ type PalettePanelProps = {
 	palette: readonly PaletteColor[];
 	selectedColorId: string | null;
 	onSelectColor: (colorId: string) => void;
+	canInteract: boolean;
+	onStartTouchDrag?: (
+		colorId: string,
+		e: React.PointerEvent<HTMLButtonElement>,
+	) => void;
+	suppressClick?: boolean;
 };
 
 export function PalettePanel({
 	palette,
 	selectedColorId,
 	onSelectColor,
+	canInteract,
+	onStartTouchDrag,
+	suppressClick,
 }: PalettePanelProps) {
 	const selectedColor = selectedColorId
 		? (palette.find((c) => c.id === selectedColorId) ?? null)
@@ -44,7 +53,26 @@ export function PalettePanel({
 							type="button"
 							className={`swatch ${isSelected ? 'selected' : ''}`}
 							style={{ background: c.hex }}
-							onClick={() => onSelectColor(c.id)}
+							onClick={(e) => {
+								if (suppressClick) {
+									e.preventDefault();
+									e.stopPropagation();
+									return;
+								}
+								onSelectColor(c.id);
+							}}
+							onPointerDown={(e) => {
+								if (!canInteract) return;
+								if (e.pointerType === 'mouse') return;
+								onSelectColor(c.id);
+								onStartTouchDrag?.(c.id, e);
+							}}
+							draggable
+							onDragStart={(e) => {
+								e.dataTransfer.effectAllowed = 'copy';
+								e.dataTransfer.setData('application/x-mastermind-color', c.id);
+								e.dataTransfer.setData('text/plain', c.id);
+							}}
 							title={c.label}
 							aria-label={c.label}
 						/>

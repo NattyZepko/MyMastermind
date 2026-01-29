@@ -1,3 +1,4 @@
+import { useState } from 'react';
 import type { PaletteColor } from '../game/palette';
 
 type GuessPanelProps = {
@@ -12,10 +13,12 @@ type GuessPanelProps = {
 	secret: string[];
 	showCopyResults?: boolean;
 	onCopyResults?: () => void;
+	externalDragOverIndex?: number | null;
 
 	onClearCurrentGuess: () => void;
 	onSubmitGuess: () => void;
 	onSetPeg: (index: number) => void;
+	onSetPegColor?: (index: number, colorId: string) => void;
 	onClearPeg: (index: number) => void;
 };
 
@@ -31,11 +34,23 @@ export function GuessPanel({
 	secret,
 	showCopyResults,
 	onCopyResults,
+	externalDragOverIndex,
 	onClearCurrentGuess,
 	onSubmitGuess,
 	onSetPeg,
+	onSetPegColor,
 	onClearPeg,
 }: GuessPanelProps) {
+	const [dragOverIndex, setDragOverIndex] = useState<number | null>(null);
+	const effectiveDragOverIndex = externalDragOverIndex ?? dragOverIndex;
+
+	function tryGetDraggedColorId(e: React.DragEvent) {
+		return (
+			e.dataTransfer.getData('application/x-mastermind-color') ||
+			e.dataTransfer.getData('text/plain')
+		);
+	}
+
 	return (
 		<section className="panel">
 			<div className="guessHeader">
@@ -88,9 +103,36 @@ export function GuessPanel({
 						<button
 							key={i}
 							type="button"
-							className="peg"
+							data-peg-index={i}
+							className={`peg${effectiveDragOverIndex === i ? ' dragOver' : ''}`}
 							style={{ background: color ? color.hex : 'transparent' }}
 							onClick={() => onSetPeg(i)}
+							onDragEnter={(e) => {
+								if (!canInteract) return;
+								if (!onSetPegColor) return;
+								if (!tryGetDraggedColorId(e)) return;
+								setDragOverIndex(i);
+							}}
+							onDragOver={(e) => {
+								if (!canInteract) return;
+								if (!onSetPegColor) return;
+								if (!tryGetDraggedColorId(e)) return;
+								e.preventDefault();
+								e.dataTransfer.dropEffect = 'copy';
+								setDragOverIndex(i);
+							}}
+							onDragLeave={() => {
+								setDragOverIndex((prev) => (prev === i ? null : prev));
+							}}
+							onDrop={(e) => {
+								if (!canInteract) return;
+								if (!onSetPegColor) return;
+								e.preventDefault();
+								const droppedColorId = tryGetDraggedColorId(e);
+								if (!droppedColorId) return;
+								onSetPegColor(i, droppedColorId);
+								setDragOverIndex(null);
+							}}
 							onContextMenu={(e) => {
 								e.preventDefault();
 								onClearPeg(i);
