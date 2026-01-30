@@ -146,7 +146,6 @@ export function GuessPanel({
 							onPointerDown={(e) => {
 								if (!canDragThisPeg) return;
 								if (e.pointerType === 'mouse') return;
-								e.preventDefault();
 								e.currentTarget.setPointerCapture?.(e.pointerId);
 								onStartTouchDrag?.(colorId as string, {
 									kind: 'pointer',
@@ -159,7 +158,6 @@ export function GuessPanel({
 								if (!canDragThisPeg) return;
 								const t = e.touches.item(0);
 								if (!t) return;
-								e.preventDefault();
 								onStartTouchDrag?.(colorId as string, {
 									kind: 'touch',
 									id: t.identifier,

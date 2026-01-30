@@ -394,12 +394,22 @@ function App() {
 			},
 		) => {
 			if (!canInteract) return;
-			setSelectedColorId(colorId);
-			setError(null);
 			startTouchDrag(colorId, start);
 		},
 		[canInteract, startTouchDrag],
 	);
+
+	const selectedDragColorRef = useRef(false);
+	useEffect(() => {
+		if (!touchDrag?.started) {
+			selectedDragColorRef.current = false;
+			return;
+		}
+		if (selectedDragColorRef.current) return;
+		selectedDragColorRef.current = true;
+		setSelectedColorId(touchDrag.colorId);
+		setError(null);
+	}, [touchDrag?.colorId, touchDrag?.started]);
 
 	useEffect(() => {
 		if (!touchDrag) return;

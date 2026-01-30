@@ -69,6 +69,27 @@ describe('In-game controls (App)', () => {
 		).toBeInTheDocument();
 	});
 
+	it('allows overriding a filled peg with the selected palette color', async () => {
+		const user = await startGame();
+
+		const palette = screen.getByLabelText('Color palette');
+		const guessRow = screen.getByLabelText('Guess row');
+
+		await user.click(within(palette).getByRole('button', { name: 'Red' }));
+		await user.click(
+			within(guessRow).getByRole('button', { name: /empty slot 1/i }),
+		);
+		expect(
+			within(guessRow).getByRole('button', { name: 'Red' }),
+		).toBeInTheDocument();
+
+		await user.click(within(palette).getByRole('button', { name: 'Blue' }));
+		await user.click(within(guessRow).getByRole('button', { name: 'Red' }));
+		expect(
+			within(guessRow).getByRole('button', { name: 'Blue' }),
+		).toBeInTheDocument();
+	});
+
 	it('Clear colors empties the current guess', async () => {
 		const user = await startGame();
 
