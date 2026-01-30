@@ -15,7 +15,7 @@ export function GuessHistory({
 	canInteract,
 	onSelectGuess,
 }: GuessHistoryProps) {
-	const HISTORY_SCALE_MIN = 0.65;
+	const HISTORY_SCALE_MIN = 0.35;
 	const HISTORY_SCALE_MAX = 1;
 
 	function clampScale(value: number) {
