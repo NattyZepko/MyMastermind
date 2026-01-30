@@ -226,7 +226,7 @@
 	padding: 0;
 	margin: 0;
 	display: grid;
-	gap: 0.6rem;
+	gap: calc(0.6rem * var(--history-scale, 1));
 }
 
 .history > li {
@@ -261,15 +261,25 @@
 	cursor: not-allowed;
 }
 
+.historyPanel {
+	/*
+	Pinch-to-compact on mobile sets this via inline style.
+	We use it to scale *layout* sizes (not transform), so more rows actually fit.
+	*/
+	--history-scale: 1;
+	/* Allow vertical scrolling but disable native pinch-zoom for this panel. */
+	touch-action: pan-y;
+}
+
 .historyItem {
 	width: 100%;
 	text-align: left;
 	display: grid;
 	grid-template-columns: minmax(0, 1fr) auto;
-	gap: 0.75rem;
+	gap: calc(0.75rem * var(--history-scale, 1));
 	align-items: center;
-	padding: 0.75rem;
-	border-radius: 12px;
+	padding: calc(0.75rem * var(--history-scale, 1));
+	border-radius: calc(12px * var(--history-scale, 1));
 	border: 1px solid var(--border);
 	background: rgba(255, 255, 255, 0.02);
 }
@@ -278,29 +288,30 @@
 	display: flex;
 	flex-wrap: wrap;
 	min-width: 0;
-	gap: 0.5rem;
+	gap: calc(0.5rem * var(--history-scale, 1));
 }
 
 .digit {
-	width: 2.2rem;
-	height: 2.2rem;
+	width: calc(2.2rem * var(--history-scale, 1));
+	height: calc(2.2rem * var(--history-scale, 1));
 	display: inline-flex;
 	align-items: center;
 	justify-content: center;
-	border-radius: 10px;
+	border-radius: calc(10px * var(--history-scale, 1));
 	border: 1px solid var(--border);
 	background: rgba(255, 255, 255, 0.03);
 }
 
 .result {
 	display: inline-flex;
-	gap: 0.5rem;
+	gap: calc(0.5rem * var(--history-scale, 1));
 }
 
 .badge {
-	min-width: 2.1rem;
-	height: 2.1rem;
-	padding: 0 0.6rem;
+	min-width: calc(2.1rem * var(--history-scale, 1));
+	height: calc(2.1rem * var(--history-scale, 1));
+	padding: 0 calc(0.6rem * var(--history-scale, 1));
+	font-size: calc(1rem * var(--history-scale, 1));
 	border-radius: 999px;
 	display: inline-flex;
 	align-items: center;
