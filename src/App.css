@@ -733,11 +733,19 @@ button.secondary {
 	}
 
 	.historyItem {
-		grid-template-columns: 1fr;
-		align-items: start;
+		display: flex;
+		flex-wrap: wrap;
+		align-items: flex-start;
 	}
 
 	.result {
+		margin-left: auto;
+	}
+
+	.app.dailyChallenge .historyItem .result {
+		flex-basis: 100%;
+		margin-left: 0;
+		padding-top: 0.35rem;
 		justify-content: flex-start;
 	}
 }
