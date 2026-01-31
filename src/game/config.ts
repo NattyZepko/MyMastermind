@@ -4,6 +4,8 @@ export type GameSettings = {
 	codeLength: number;
 	paletteSize: number;
 	allowDuplicates: boolean;
+	showPegNumbers: boolean;
+	paletteOverrides: Record<string, string>;
 	mode: GameMode;
 	timeLimitMinutes: number;
 	guessLimit: number;
@@ -29,6 +31,8 @@ export const DEFAULT_SETTINGS: GameSettings = {
 	codeLength: CODE_LENGTH_DEFAULT,
 	paletteSize: PALETTE_SIZE_DEFAULT,
 	allowDuplicates: true,
+	showPegNumbers: false,
+	paletteOverrides: {},
 	mode: 'zen',
 	timeLimitMinutes: TIME_LIMIT_MINUTES_DEFAULT,
 	guessLimit: GUESS_LIMIT_DEFAULT,

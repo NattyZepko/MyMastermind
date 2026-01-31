@@ -4,6 +4,8 @@ import type { PaletteColor } from '../game/palette';
 type GuessPanelProps = {
 	codeLength: number;
 	paletteById: ReadonlyMap<string, PaletteColor>;
+	showPegNumbers?: boolean;
+	paletteNumberById?: ReadonlyMap<string, number>;
 	currentGuess: Array<string | null>;
 	canInteract: boolean;
 	error: string | null;
@@ -35,6 +37,8 @@ type GuessPanelProps = {
 export function GuessPanel({
 	codeLength,
 	paletteById,
+	showPegNumbers,
+	paletteNumberById,
 	currentGuess,
 	canInteract,
 	error,
@@ -111,6 +115,10 @@ export function GuessPanel({
 			>
 				{currentGuess.map((colorId, i) => {
 					const color = colorId ? paletteById.get(colorId) : null;
+					const n =
+						showPegNumbers && colorId
+							? (paletteNumberById?.get(colorId) ?? null)
+							: null;
 					const canDragThisPeg =
 						Boolean(colorId) &&
 						canInteract &&
@@ -202,7 +210,13 @@ export function GuessPanel({
 							}
 							aria-label={color ? `${color.label}` : `Empty slot ${i + 1}`}
 							disabled={!canInteract}
-						/>
+						>
+							{n != null ? (
+								<span className="pegLabel" aria-hidden="true">
+									{n}
+								</span>
+							) : null}
+						</button>
 					);
 				})}
 			</div>
@@ -215,13 +229,22 @@ export function GuessPanel({
 					<div className="secretReveal" aria-label="Secret code">
 						{secret.map((id, idx) => {
 							const c = paletteById.get(id);
+							const n = showPegNumbers
+								? (paletteNumberById?.get(id) ?? null)
+								: null;
 							return (
 								<span
 									key={`${id}-${idx}`}
 									className="secretPeg"
 									style={{ background: c?.hex ?? 'transparent' }}
 									title={c?.label ?? id}
-								/>
+								>
+									{n != null ? (
+										<span className="pegLabel" aria-hidden="true">
+											{n}
+										</span>
+									) : null}
+								</span>
 							);
 						})}
 					</div>

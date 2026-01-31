@@ -1,3 +1,4 @@
+import '@testing-library/jest-dom/vitest';
 import { act, fireEvent, render, screen } from '@testing-library/react';
 import { describe, expect, it, vi } from 'vitest';
 import type { GameSettings } from '../game/config';
@@ -36,6 +37,8 @@ describe('MainMenu controls', () => {
 			codeLength: 4,
 			paletteSize: 8,
 			allowDuplicates: true,
+			showPegNumbers: false,
+			paletteOverrides: {},
 			mode: 'zen',
 			timeLimitMinutes: 3,
 			guessLimit: 8,
@@ -51,6 +54,8 @@ describe('MainMenu controls', () => {
 			codeLength: 4,
 			paletteSize: 8,
 			allowDuplicates: true,
+			showPegNumbers: false,
+			paletteOverrides: {},
 			mode: 'zen',
 			timeLimitMinutes: 3,
 			guessLimit: 8,
@@ -65,6 +70,8 @@ describe('MainMenu controls', () => {
 			codeLength: 4,
 			paletteSize: 8,
 			allowDuplicates: true,
+			showPegNumbers: false,
+			paletteOverrides: {},
 			mode: 'time',
 			timeLimitMinutes: 1, // 1:00
 			guessLimit: 8,
@@ -82,6 +89,8 @@ describe('MainMenu controls', () => {
 			codeLength: 4,
 			paletteSize: 8,
 			allowDuplicates: true,
+			showPegNumbers: false,
+			paletteOverrides: {},
 			mode: 'time',
 			timeLimitMinutes: 1 + 59 / 60, // 1:59
 			guessLimit: 8,
@@ -105,6 +114,8 @@ describe('MainMenu controls', () => {
 			codeLength: 4,
 			paletteSize: 8,
 			allowDuplicates: true,
+			showPegNumbers: false,
+			paletteOverrides: {},
 			mode: 'time',
 			timeLimitMinutes: 1, // 1:00
 			guessLimit: 8,
@@ -127,6 +138,8 @@ describe('MainMenu controls', () => {
 			codeLength: 3,
 			paletteSize: 8,
 			allowDuplicates: true,
+			showPegNumbers: false,
+			paletteOverrides: {},
 			mode: 'zen',
 			timeLimitMinutes: 3,
 			guessLimit: 8,

@@ -5,6 +5,8 @@ import type { GuessResult } from '../game/types';
 type GuessHistoryProps = {
 	guesses: GuessResult[];
 	paletteById: ReadonlyMap<string, PaletteColor>;
+	showPegNumbers?: boolean;
+	paletteNumberById?: ReadonlyMap<string, number>;
 	canInteract?: boolean;
 	onSelectGuess?: (guess: string[]) => void;
 };
@@ -12,6 +14,8 @@ type GuessHistoryProps = {
 export function GuessHistory({
 	guesses,
 	paletteById,
+	showPegNumbers,
+	paletteNumberById,
 	canInteract,
 	onSelectGuess,
 }: GuessHistoryProps) {
@@ -165,13 +169,22 @@ export function GuessHistory({
 									<div className="guessDigits" aria-label={`Guess ${g.id}`}>
 										{g.guess.map((id, i) => {
 											const c = paletteById.get(id);
+											const n = showPegNumbers
+												? (paletteNumberById?.get(id) ?? null)
+												: null;
 											return (
 												<span
 													key={`${g.id}-${i}`}
 													className="digit"
 													style={{ background: c?.hex ?? 'transparent' }}
 													title={c?.label ?? id}
-												/>
+												>
+													{n != null ? (
+														<span className="pegLabel" aria-hidden="true">
+															{n}
+														</span>
+													) : null}
+												</span>
 											);
 										})}
 									</div>

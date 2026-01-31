@@ -5,6 +5,8 @@ type PalettePanelProps = {
 	selectedColorId: string | null;
 	onSelectColor: (colorId: string) => void;
 	canInteract: boolean;
+	showPegNumbers?: boolean;
+	paletteNumberById?: ReadonlyMap<string, number>;
 	onStartTouchDrag?: (
 		colorId: string,
 		start: {
@@ -22,12 +24,18 @@ export function PalettePanel({
 	selectedColorId,
 	onSelectColor,
 	canInteract,
+	showPegNumbers,
+	paletteNumberById,
 	onStartTouchDrag,
 	suppressClick,
 }: PalettePanelProps) {
 	const selectedColor = selectedColorId
 		? (palette.find((c) => c.id === selectedColorId) ?? null)
 		: null;
+	const selectedNumber =
+		showPegNumbers && selectedColorId
+			? (paletteNumberById?.get(selectedColorId) ?? null)
+			: null;
 
 	return (
 		<section className="panel">
@@ -42,6 +50,9 @@ export function PalettePanel({
 								style={{ background: selectedColor.hex }}
 							/>
 							{selectedColor.label}
+							{selectedNumber != null ? (
+								<span className="muted">#{selectedNumber}</span>
+							) : null}
 						</span>
 					) : (
 						'none'
@@ -52,6 +63,9 @@ export function PalettePanel({
 			<div className="palette" aria-label="Color palette">
 				{palette.map((c) => {
 					const isSelected = c.id === selectedColorId;
+					const n = showPegNumbers
+						? (paletteNumberById?.get(c.id) ?? null)
+						: null;
 					return (
 						<button
 							key={c.id}
@@ -100,7 +114,13 @@ export function PalettePanel({
 							}}
 							title={c.label}
 							aria-label={c.label}
-						/>
+						>
+							{n != null ? (
+								<span className="pegLabel" aria-hidden="true">
+									{n}
+								</span>
+							) : null}
+						</button>
 					);
 				})}
 			</div>

@@ -19,24 +19,131 @@ import { generateSecret, generateSecretSeeded, scoreGuess } from './mastermind';
 
 type Screen = 'menu' | 'game';
 
+const SETTINGS_STORAGE_KEY = 'natty-mastermind-settings-v1';
+
+function isPlainRecord(value: unknown): value is Record<string, unknown> {
+	return Boolean(value) && typeof value === 'object' && !Array.isArray(value);
+}
+
+function normalizeHexColor(input: unknown): string | null {
+	if (typeof input !== 'string') return null;
+	const s = input.trim();
+	if (/^#[0-9a-fA-F]{6}$/.test(s)) return s.toLowerCase();
+	if (/^#[0-9a-fA-F]{3}$/.test(s)) {
+		const r = s[1];
+		const g = s[2];
+		const b = s[3];
+		return `#${r}${r}${g}${g}${b}${b}`.toLowerCase();
+	}
+	return null;
+}
+
+function normalizePaletteOverrides(input: unknown): Record<string, string> {
+	if (!isPlainRecord(input)) return {};
+	const out: Record<string, string> = {};
+	for (const [k, v] of Object.entries(input)) {
+		const hex = normalizeHexColor(v);
+		if (hex) out[k] = hex;
+	}
+	return out;
+}
+
+function loadSettingsFromStorage(): GameSettings {
+	if (typeof window === 'undefined') return DEFAULT_SETTINGS;
+	try {
+		const raw = window.localStorage.getItem(SETTINGS_STORAGE_KEY);
+		if (!raw) return DEFAULT_SETTINGS;
+		const parsed: unknown = JSON.parse(raw);
+		if (!isPlainRecord(parsed)) return DEFAULT_SETTINGS;
+
+		const obj = parsed as Record<string, unknown>;
+		const codeLength =
+			typeof obj.codeLength === 'number'
+				? obj.codeLength
+				: DEFAULT_SETTINGS.codeLength;
+		const paletteSize =
+			typeof obj.paletteSize === 'number'
+				? obj.paletteSize
+				: DEFAULT_SETTINGS.paletteSize;
+		const allowDuplicates =
+			typeof obj.allowDuplicates === 'boolean'
+				? obj.allowDuplicates
+				: DEFAULT_SETTINGS.allowDuplicates;
+		const showPegNumbers =
+			typeof obj.showPegNumbers === 'boolean'
+				? obj.showPegNumbers
+				: DEFAULT_SETTINGS.showPegNumbers;
+		const mode =
+			obj.mode === 'zen' || obj.mode === 'time' || obj.mode === 'limited'
+				? obj.mode
+				: DEFAULT_SETTINGS.mode;
+		const timeLimitMinutes =
+			typeof obj.timeLimitMinutes === 'number'
+				? obj.timeLimitMinutes
+				: DEFAULT_SETTINGS.timeLimitMinutes;
+		const guessLimit =
+			typeof obj.guessLimit === 'number'
+				? obj.guessLimit
+				: DEFAULT_SETTINGS.guessLimit;
+
+		const merged: GameSettings = {
+			codeLength,
+			paletteSize,
+			allowDuplicates,
+			showPegNumbers,
+			paletteOverrides: normalizePaletteOverrides(obj.paletteOverrides),
+			mode,
+			timeLimitMinutes,
+			guessLimit,
+		};
+
+		return normalizeSettings(merged);
+	} catch {
+		return DEFAULT_SETTINGS;
+	}
+}
+
+function saveSettingsToStorage(settings: GameSettings) {
+	if (typeof window === 'undefined') return;
+	try {
+		window.localStorage.setItem(SETTINGS_STORAGE_KEY, JSON.stringify(settings));
+	} catch {
+		// Ignore storage failures (private mode, quota, etc.)
+	}
+}
+
 function App() {
 	const [screen, setScreen] = useState<Screen>('menu');
-	const [settings, setSettings] = useState<GameSettings>(DEFAULT_SETTINGS);
+	const [settings, setSettings] = useState<GameSettings>(() =>
+		loadSettingsFromStorage(),
+	);
 	const [menuSettingsBeforeChallenge, setMenuSettingsBeforeChallenge] =
 		useState<GameSettings | null>(null);
 	const [isDailyChallenge, setIsDailyChallenge] = useState(false);
 	const [dailySeed, setDailySeed] = useState<string | null>(null);
 
+	useEffect(() => {
+		saveSettingsToStorage(settings);
+	}, [settings]);
+
 	const normalizedSettings = useMemo(
 		() => normalizeSettings(settings),
 		[settings],
 	);
-	const activePalette = useMemo(
-		() => PALETTE.slice(0, normalizedSettings.paletteSize),
-		[normalizedSettings.paletteSize],
-	);
+	const activePalette = useMemo(() => {
+		const base = PALETTE.slice(0, normalizedSettings.paletteSize);
+		const overrides = normalizedSettings.paletteOverrides;
+		if (!overrides || Object.keys(overrides).length === 0) return base;
+		return base.map((c) => {
+			const hex = normalizeHexColor(overrides[c.id]);
+			return hex ? { ...c, hex } : c;
+		});
+	}, [normalizedSettings.paletteOverrides, normalizedSettings.paletteSize]);
 	const activePaletteById = useMemo(() => {
 		return new Map<string, PaletteColor>(activePalette.map((c) => [c.id, c]));
+	}, [activePalette]);
+	const activePaletteNumberById = useMemo(() => {
+		return new Map<string, number>(activePalette.map((c, i) => [c.id, i + 1]));
 	}, [activePalette]);
 
 	const [secret, setSecret] = useState<string[]>([]);
@@ -78,6 +185,8 @@ function App() {
 		if (!selectedColor) return undefined;
 		return cssCursorFor(selectedColor.hex);
 	}, [selectedColor]);
+
+	const showPegNumbers = normalizedSettings.showPegNumbers;
 
 	const elapsedSeconds = useMemo(() => {
 		if (!gameStartMs) return 0;
@@ -636,7 +745,13 @@ function App() {
 						background:
 							activePaletteById.get(touchDrag.colorId)?.hex ?? 'transparent',
 					}}
-				/>
+				>
+					{showPegNumbers ? (
+						<span className="pegLabel" aria-hidden="true">
+							{activePaletteNumberById.get(touchDrag.colorId) ?? ''}
+						</span>
+					) : null}
+				</div>
 			) : null}
 			{screen === 'game' && isSolved ? <ConfettiOverlay /> : null}
 			<Header
@@ -668,6 +783,8 @@ function App() {
 				palette={activePalette}
 				selectedColorId={selectedColorId}
 				canInteract={canInteract}
+				showPegNumbers={showPegNumbers}
+				paletteNumberById={activePaletteNumberById}
 				onSelectColor={(colorId) => {
 					setSelectedColorId(colorId);
 					setError(null);
@@ -679,6 +796,8 @@ function App() {
 			<GuessPanel
 				codeLength={normalizedSettings.codeLength}
 				paletteById={activePaletteById}
+				showPegNumbers={showPegNumbers}
+				paletteNumberById={activePaletteNumberById}
 				currentGuess={currentGuess}
 				canInteract={canInteract}
 				error={error}
@@ -703,6 +822,8 @@ function App() {
 			<GuessHistory
 				guesses={guesses}
 				paletteById={activePaletteById}
+				showPegNumbers={showPegNumbers}
+				paletteNumberById={activePaletteNumberById}
 				canInteract={canInteract}
 				onSelectGuess={(guess) => {
 					if (!canInteract) return;

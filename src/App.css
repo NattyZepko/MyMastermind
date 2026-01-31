@@ -292,14 +292,19 @@
 }
 
 .digit {
-	width: calc(2.2rem * var(--history-scale, 1));
-	height: calc(2.2rem * var(--history-scale, 1));
+	--digit-size: calc(2.2rem * var(--history-scale, 1));
+	width: var(--digit-size);
+	height: var(--digit-size);
 	display: inline-flex;
 	align-items: center;
 	justify-content: center;
 	border-radius: calc(10px * var(--history-scale, 1));
 	border: 1px solid var(--border);
 	background: rgba(255, 255, 255, 0.03);
+}
+
+.digit .pegLabel {
+	font-size: calc(var(--digit-size) * 0.42);
 }
 
 .result {
@@ -441,6 +446,9 @@ button.secondary {
 	border-radius: var(--tile-radius);
 	border: 2px solid rgba(255, 255, 255, 0.2);
 	padding: 0;
+	display: inline-flex;
+	align-items: center;
+	justify-content: center;
 	cursor: grab;
 	-webkit-tap-highlight-color: transparent;
 }
@@ -498,6 +506,9 @@ button.secondary {
 	border: 2px solid rgba(255, 255, 255, 0.2);
 	background: rgba(255, 255, 255, 0.03);
 	padding: 0;
+	display: inline-flex;
+	align-items: center;
+	justify-content: center;
 	cursor: inherit;
 	-webkit-tap-highlight-color: transparent;
 	box-shadow:
@@ -533,7 +544,41 @@ button.secondary {
 	border-radius: var(--tile-radius);
 	border: 2px solid rgba(255, 255, 255, 0.25);
 	background: rgba(255, 255, 255, 0.03);
-	display: inline-block;
+	display: inline-flex;
+	align-items: center;
+	justify-content: center;
+}
+
+.touchDragGhost {
+	display: flex;
+	align-items: center;
+	justify-content: center;
+}
+
+.pegLabel {
+	pointer-events: none;
+	user-select: none;
+	font-weight: 900;
+	line-height: 1;
+	color: rgba(255, 255, 255, 0.94);
+	text-shadow:
+		0 1px 2px rgba(0, 0, 0, 0.75),
+		0 0 14px rgba(0, 0, 0, 0.45);
+	-webkit-text-stroke: 1px rgba(0, 0, 0, 0.25);
+	font-variant-numeric: tabular-nums;
+}
+
+.swatch .pegLabel {
+	font-size: calc(var(--swatch-size) * 0.42);
+}
+
+.peg .pegLabel,
+.secretPeg .pegLabel {
+	font-size: calc(var(--peg-size) * 0.42);
+}
+
+.touchDragGhost .pegLabel {
+	font-size: calc(var(--swatch-size) * 0.42);
 }
 
 .status {

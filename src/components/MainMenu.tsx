@@ -10,6 +10,7 @@ import {
 	TIME_LIMIT_MINUTES_MAX,
 	TIME_LIMIT_MINUTES_MIN,
 } from '../game/config';
+import { PALETTE } from '../game/palette';
 import { RainbowTitle } from './RainbowTitle';
 
 const MAIN_MENU_CODE_LENGTH_MAX = 6;
@@ -34,6 +35,18 @@ function wrapInt(value: number, min: number, max: number) {
 
 function pad2(n: number) {
 	return String(n).padStart(2, '0');
+}
+
+function normalizeHexColor(input: string): string | null {
+	const s = input.trim();
+	if (/^#[0-9a-fA-F]{6}$/.test(s)) return s.toLowerCase();
+	if (/^#[0-9a-fA-F]{3}$/.test(s)) {
+		const r = s[1];
+		const g = s[2];
+		const b = s[3];
+		return `#${r}${r}${g}${g}${b}${b}`.toLowerCase();
+	}
+	return null;
 }
 
 type StepperNumberInputProps = {
@@ -239,6 +252,8 @@ export function MainMenu({
 	onDailyChallenge,
 }: MainMenuProps) {
 	const [rulesOpen, setRulesOpen] = useState(false);
+	const [advancedOpen, setAdvancedOpen] = useState(false);
+	const [paletteEditorOpen, setPaletteEditorOpen] = useState(false);
 
 	function set<K extends keyof GameSettings>(key: K, value: GameSettings[K]) {
 		onChange({ ...settings, [key]: value });
@@ -455,6 +470,214 @@ export function MainMenu({
 						<button type="button" onClick={onPlay} className="playButton">
 							Play
 						</button>
+					</div>
+				</div>
+			</section>
+
+			<section className="panel gameRules advancedSettings">
+				<button
+					type="button"
+					className="rulesTitleRow"
+					onClick={() => setAdvancedOpen((open) => !open)}
+					aria-expanded={advancedOpen}
+					aria-controls="advancedSettingsBody"
+					title={
+						advancedOpen
+							? 'Hide appearance settings'
+							: 'Show appearance settings'
+					}
+				>
+					<div className="rulesLogo" aria-hidden="true">
+						<svg
+							viewBox="0 0 24 24"
+							role="img"
+							focusable="false"
+							aria-label="Advanced"
+						>
+							<path
+								fill="currentColor"
+								d="M19.14 12.94c.04-.31.06-.63.06-.94s-.02-.63-.06-.94l2.03-1.58a.5.5 0 0 0 .12-.64l-1.92-3.32a.5.5 0 0 0-.6-.22l-2.39.96a7.2 7.2 0 0 0-1.63-.94l-.36-2.54A.5.5 0 0 0 13.9 1h-3.8a.5.5 0 0 0-.49.42l-.36 2.54c-.58.22-1.12.52-1.63.94l-2.39-.96a.5.5 0 0 0-.6.22L2.7 7.48a.5.5 0 0 0 .12.64l2.03 1.58c-.04.31-.06.63-.06.94s.02.63.06.94L2.82 14.5a.5.5 0 0 0-.12.64l1.92 3.32c.13.23.4.32.64.22l2.39-.96c.5.41 1.05.73 1.63.94l.36 2.54c.04.24.25.42.49.42h3.8c.24 0 .45-.18.49-.42l.36-2.54c.58-.22 1.12-.52 1.63-.94l2.39.96c.24.1.51.01.64-.22l1.92-3.32a.5.5 0 0 0-.12-.64l-2.03-1.56ZM12 15.5A3.5 3.5 0 1 1 12 8a3.5 3.5 0 0 1 0 7.5Z"
+							/>
+						</svg>
+					</div>
+					<h2 className="h2">Appearance settings</h2>
+					<span className="rulesChevron" aria-hidden="true">
+						▼
+					</span>
+				</button>
+				<div
+					id="advancedSettingsBody"
+					className="rulesBody"
+					hidden={!advancedOpen}
+				>
+					<label
+						className="checkboxRow"
+						title="Adds a number label inside each colored peg (1..palette size) to help distinguish colors."
+					>
+						<input
+							type="checkbox"
+							checked={settings.showPegNumbers}
+							onChange={(e) => set('showPegNumbers', e.target.checked)}
+						/>
+						<span>
+							Show numbers <strong>(Color Blind Assist)</strong>
+						</span>
+					</label>
+					<p className="muted" style={{ margin: '0.5rem 0 0' }}>
+						Shows numbers inside the colored pegs in palette.
+					</p>
+
+					<hr style={{ opacity: 0.2, margin: '1rem 0' }} />
+
+					<button
+						type="button"
+						className="rulesTitleRow"
+						onClick={() => setPaletteEditorOpen((open) => !open)}
+						aria-expanded={paletteEditorOpen}
+						aria-controls="advancedPaletteBody"
+						title={
+							paletteEditorOpen ? 'Hide palette editor' : 'Show palette editor'
+						}
+					>
+						<h3 className="h2" style={{ margin: 0 }}>
+							Customize palette colors
+						</h3>
+						<span className="rulesChevron" aria-hidden="true">
+							▼
+						</span>
+					</button>
+					<div id="advancedPaletteBody" hidden={!paletteEditorOpen}>
+						<div className="muted" style={{ margin: '0.5rem 0' }}>
+							These are palette slots, so they’re labeled Color 1, Color 2, etc.
+						</div>
+
+						<div style={{ display: 'grid', gap: '0.5rem' }}>
+							{PALETTE.map((c, i) => {
+								const label = `Color ${i + 1}`;
+								const override = settings.paletteOverrides?.[c.id] ?? '';
+								const overrideHex = normalizeHexColor(override);
+								const effectiveHex = overrideHex ?? c.hex;
+								return (
+									<div
+										key={c.id}
+										className="checkboxRow"
+										style={{
+											justifyContent: 'space-between',
+											gap: '0.75rem',
+										}}
+									>
+										<div
+											style={{
+												display: 'flex',
+												alignItems: 'center',
+												gap: '0.5rem',
+											}}
+										>
+											<span
+												aria-hidden="true"
+												style={{
+													width: 16,
+													height: 16,
+													borderRadius: 4,
+													background: effectiveHex,
+													border: '1px solid rgba(255,255,255,0.25)',
+												}}
+											/>
+											<span>{label}</span>
+										</div>
+
+										<div
+											style={{
+												display: 'flex',
+												alignItems: 'center',
+												gap: '0.5rem',
+											}}
+										>
+											<input
+												type="color"
+												value={effectiveHex}
+												onChange={(e) => {
+													const hex = normalizeHexColor(e.target.value);
+													if (!hex) return;
+													set('paletteOverrides', {
+														...(settings.paletteOverrides ?? {}),
+														[c.id]: hex,
+													});
+												}}
+												title={`Pick ${label}`}
+												aria-label={`${label} color picker`}
+												style={{ width: 42, height: 28 }}
+											/>
+											<input
+												key={`${c.id}:${override}`}
+												type="text"
+												inputMode="text"
+												defaultValue={overrideHex ?? ''}
+												onKeyDown={(e) => {
+													if (e.key !== 'Enter') return;
+													(e.currentTarget as HTMLInputElement).blur();
+												}}
+												onBlur={(e) => {
+													const raw = e.currentTarget.value;
+													const trimmed = raw.trim();
+													if (trimmed === '') {
+														const next = {
+															...(settings.paletteOverrides ?? {}),
+														};
+														delete next[c.id];
+														set('paletteOverrides', next);
+														return;
+													}
+													const hex = normalizeHexColor(trimmed);
+													if (!hex) {
+														e.currentTarget.value = overrideHex ?? '';
+														return;
+													}
+													set('paletteOverrides', {
+														...(settings.paletteOverrides ?? {}),
+														[c.id]: hex,
+													});
+												}}
+												placeholder={c.hex}
+												aria-label={`${label} hex`}
+												style={{
+													width: 92,
+													fontFamily:
+														'ui-monospace, SFMono-Regular, Menlo, monospace',
+												}}
+											/>
+											<button
+												type="button"
+												className="secondary"
+												onClick={() => {
+													const next = { ...(settings.paletteOverrides ?? {}) };
+													delete next[c.id];
+													set('paletteOverrides', next);
+												}}
+												title={`Reset ${label} to default`}
+											>
+												Reset
+											</button>
+										</div>
+									</div>
+								);
+							})}
+						</div>
+
+						<div
+							style={{ marginTop: '0.75rem', display: 'flex', gap: '0.5rem' }}
+						>
+							<button
+								type="button"
+								className="secondary"
+								onClick={() => set('paletteOverrides', {})}
+							>
+								Reset all palette colors
+							</button>
+							<span className="muted" style={{ alignSelf: 'center' }}>
+								Edits apply immediately and are saved.
+							</span>
+						</div>
 					</div>
 				</div>
 			</section>
