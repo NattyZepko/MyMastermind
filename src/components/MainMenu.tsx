@@ -548,7 +548,12 @@ export function MainMenu({
 					</button>
 					<div id="advancedPaletteBody" hidden={!paletteEditorOpen}>
 						<div className="muted" style={{ margin: '0.5rem 0' }}>
-							These are palette slots, so they’re labeled Color 1, Color 2, etc.
+							These are all of the colors in the palette, by order of
+							appearance. <br />
+							If your game has less than the full palette size, only the first
+							relevant colors will be used. <br />
+							You can customize any color by entering a hex code (e.g.{' '}
+							<code>#ff0000</code>) or using the color picker. <br />
 						</div>
 
 						<div style={{ display: 'grid', gap: '0.5rem' }}>
