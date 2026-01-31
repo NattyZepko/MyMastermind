@@ -3,7 +3,7 @@
 	<head>
 		<meta charset="UTF-8" />
 		<meta name="viewport" content="width=device-width, initial-scale=1.0" />
-		<title>Natty Mastermind — How to Play</title>
+		<title>Natty Mastermind - How to Play</title>
 		<meta
 			name="description"
 			content="How to play Natty Mastermind: the goal, game flow, and how guess feedback is calculated and interpreted."
@@ -410,17 +410,17 @@
 				</p>
 				<ul>
 					<li>
-						<strong>Right color, right place</strong> — how many pegs are an
+						<strong>Right color, right place</strong> - how many pegs are an
 						exact match.
 					</li>
 					<li>
-						<strong>Right color, wrong place</strong> — how many additional pegs
+						<strong>Right color, wrong place</strong> - how many additional pegs
 						have the right color but are in the wrong position.
 					</li>
 				</ul>
 				<p class="small">
 					You win when <code>Right color, right place</code> equals the full
-					code length.
+					code length, meaning you found the exact secret.
 				</p>
 				<div class="demo" aria-label="Goal example">
 					<p class="demoTitle">Example round</p>
@@ -434,7 +434,7 @@
 								<span class="peg hidden" title="Hidden"></span>
 							</div>
 							<p class="small" style="margin: 0.5rem 0 0">
-								You don’t see the secret until you win.
+								You don't see the secret until you win.
 							</p>
 						</div>
 						<div>
@@ -473,8 +473,8 @@
 			<section class="card">
 				<h2>What do the two result numbers mean?</h2>
 				<p>
-					The green badge is “right color, right place”. The orange badge is
-					“right color, wrong place”.
+					The green badge is "right color, right place". The orange badge is
+					"right color, wrong place".
 				</p>
 				<div class="demo" aria-label="Badges meaning demo">
 					<p class="demoTitle">Example</p>
@@ -500,18 +500,24 @@
 						</span>
 					</div>
 					<p class="small" style="margin: 0.6rem 0 0">
-						This does not say which pegs are right — only the totals.
+						This does not say which pegs are right - only the totals.
 					</p>
 				</div>
 			</section>
 
 			<section class="card">
-				<h2>What’s in the secret?</h2>
+				<h2>What's in the secret?</h2>
 				<ul>
-					<li>The secret has <strong>N</strong> pegs ("Colors in secret").</li>
+					<li>
+						The secret has <strong>a number</strong> of pegs ("Colors in
+						secret").
+					</li>
 					<li>Each peg is chosen from the palette ("Colors in palette").</li>
 				</ul>
-				<p class="small">The palette colors depend on your settings.</p>
+				<p class="small">
+					The palette colors and the number of pegs depend on your settings, or
+					game mode.
+				</p>
 				<div class="demo" aria-label="Secret composition example">
 					<p class="demoTitle">Default palette (sample)</p>
 					<div class="swatches" aria-label="Default palette colors">
@@ -563,8 +569,8 @@
 			<section class="card">
 				<h2>Do colors repeat?</h2>
 				<p>
-					Sometimes. If “Duplicates” is enabled, the secret may include the same
-					color more than once. In “Daily Challenge” mode, duplicates are always
+					Sometimes. If "Duplicates" is enabled, the secret may include the same
+					color more than once. In "Daily Challenge" mode, duplicates are always
 					allowed.
 				</p>
 				<div class="demo" aria-label="Duplicates demo">
@@ -604,8 +610,8 @@
 				</p>
 				<ul>
 					<li>
-						<strong>Right color, right place</strong>: count positions
-						<em>i</em> where <code>guess[i] === secret[i]</code>.
+						<strong>Right color, right place</strong>: count positions where the
+						guess color and the secret color are the same.
 					</li>
 					<li>
 						<strong>Total color matches</strong>: for each color, take the
@@ -614,12 +620,12 @@
 					</li>
 					<li>
 						<strong>Right color, wrong place</strong> =
-						<code>Total color matches − Right color, right place</code>.
+						<code>Total color matches - Right color, right place</code>.
 					</li>
 				</ul>
 
 				<div class="demo" aria-label="Feedback calculation example">
-					<p class="demoTitle">Example with real colors</p>
+					<p class="demoTitle">Example</p>
 					<div class="demoGrid">
 						<div>
 							<div class="pegRow" aria-label="Example secret">
@@ -641,7 +647,7 @@
 								<span class="peg green" title="Green"></span>
 							</div>
 							<p class="small" style="margin: 0.6rem 0 0">
-								Exact match: the second peg (Blue).
+								Exact match: the <strong>only</strong> second peg (Blue).
 							</p>
 						</div>
 
@@ -663,11 +669,11 @@
 								</span>
 							</div>
 							<p class="small" style="margin: 0.6rem 0 0">
-								Total color matches = 3 (Red once + Blue twice). Green doesn’t
+								Total color matches = 3 (Red once + Blue twice). Green doesn't
 								appear in the secret.
 							</p>
 							<p class="small" style="margin: 0.6rem 0 0">
-								So: <code>wrong place = 3 − 1 = 2</code>.
+								So: <code>wrong place = 3 - 1 = 2</code>.
 							</p>
 						</div>
 					</div>
@@ -675,7 +681,7 @@
 			</section>
 
 			<section class="card">
-				<h2>Can a color be “over-counted” when duplicates exist?</h2>
+				<h2>Can a color be "over-counted" when duplicates exist?</h2>
 				<p>
 					No. A color can only be counted as many times as it appears in the
 					secret.
@@ -711,7 +717,7 @@
 								</span>
 							</div>
 							<p class="small" style="margin: 0.6rem 0 0">
-								Only one Red exists in the secret, so the guess can’t earn more
+								Only one Red exists in the secret, so the guess can't earn more
 								than one total Red match.
 							</p>
 						</div>
@@ -724,11 +730,11 @@
 				<ul>
 					<li>
 						Feedback does <strong>not</strong> tell you which specific pegs were
-						right or wrong — only the totals.
+						right or wrong - only the totals.
 					</li>
 					<li>
-						“Right color, wrong place” never includes pegs already counted as
-						“right place”.
+						"Right color, wrong place" never includes pegs already counted as
+						"right place".
 					</li>
 					<li>
 						If duplicates are allowed, a color can only be credited as many
@@ -736,8 +742,10 @@
 					</li>
 				</ul>
 				<p class="small">
-					Tip: start by finding a guess that increases “right place”, then use
-					controlled swaps to see what changes.
+					Tip: start by finding a guess that increases "right place", then use
+					controlled swaps to see what changes. When you find all of the colors
+					in the code, it's hard to find new information - focus on arranging
+					the known colors, and gather information from previous guesses.
 				</p>
 				<div class="demo" aria-label="Interpreting results example">
 					<p class="demoTitle">Same feedback can fit multiple secrets</p>
@@ -787,7 +795,7 @@
 						</div>
 					</div>
 					<p class="small" style="margin: 0.7rem 0 0">
-						Feedback totals guide your reasoning, but don’t pinpoint positions.
+						Feedback totals guide your reasoning, but don't pinpoint positions.
 					</p>
 				</div>
 			</section>
@@ -795,9 +803,9 @@
 			<section class="card">
 				<h2>How random is the secret?</h2>
 				<p>
-					Regular games use secure randomness from your browser (Web Crypto).
-					The Daily Challenge is deterministic (everyone gets the same secret
-					for the day).
+					Regular games use secure randomness from your browser (Web Crypto
+					algorithm). The Daily Challenge is deterministic (everyone gets the
+					same secret for the day).
 				</p>
 				<div class="demo" aria-label="Randomness demo">
 					<p class="demoTitle">Example</p>
@@ -814,7 +822,7 @@
 								<span class="peg hidden" title="Hidden"></span>
 							</div>
 							<p class="small" style="margin: 0.6rem 0 0">
-								Different each time.
+								Different each time you play, and unpredictable.
 							</p>
 						</div>
 						<div>
@@ -823,6 +831,10 @@
 							</p>
 							<div class="pegRow" aria-label="Example daily secret">
 								<span class="pegLabel">Secret</span>
+								<span class="peg hidden" title="Hidden"></span>
+								<span class="peg hidden" title="Hidden"></span>
+								<span class="peg hidden" title="Hidden"></span>
+								<span class="peg hidden" title="Hidden"></span>
 								<span class="peg hidden" title="Hidden"></span>
 								<span class="peg hidden" title="Hidden"></span>
 								<span class="peg hidden" title="Hidden"></span>
@@ -887,34 +899,9 @@
 							<div class="timerFill" aria-hidden="true"></div>
 						</div>
 						<p class="small" style="margin: 0.45rem 0 0">
-							Solve before the bar hits zero.
+							Solve before the timer hits zero.
 						</p>
 					</div>
-				</div>
-			</section>
-
-			<section class="card">
-				<h2>Next: learn the inputs</h2>
-				<p>
-					See the <a href="/controls.html">Controls</a> page for clicking,
-					dragging, right-click-to-clear, the <kbd>Enter</kbd> shortcut, and the
-					pinch gesture.
-				</p>
-				<div class="demo" aria-label="Practice example">
-					<p class="demoTitle">Quick practice</p>
-					<p class="small" style="margin: 0 0 0.6rem">
-						Try entering this guess using the controls:
-					</p>
-					<div class="pegRow" aria-label="Practice guess">
-						<span class="pegLabel">Guess</span>
-						<span class="peg orange" title="Orange"></span>
-						<span class="peg purple" title="Purple"></span>
-						<span class="peg cyan" title="Cyan"></span>
-						<span class="peg green" title="Green"></span>
-					</div>
-					<p class="small" style="margin: 0.6rem 0 0">
-						Then press <kbd>Enter</kbd> to submit.
-					</p>
 				</div>
 			</section>
 		</main>

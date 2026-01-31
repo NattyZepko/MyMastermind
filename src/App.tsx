@@ -702,7 +702,7 @@ function App() {
 		if (gaveUp) return 'Game over... This was the secret:';
 		if (isSolved) {
 			if (isDailyChallenge && solvedAt !== null) {
-				return `Congratulations — you beat today's Daily Challenge in ${solvedAt} guesses!`;
+				return `Congratulations - you beat today's Daily Challenge in ${solvedAt} guesses!`;
 			}
 			return `Solved in ${solvedAt} guess${solvedAt === 1 ? '' : 'es'}.`;
 		}

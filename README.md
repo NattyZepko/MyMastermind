@@ -1,6 +1,6 @@
 ﻿# Natty Mastermind (Vite + React + TypeScript)
 
-A client-side single page application for a Mastermind-style game using **colors** — featuring a **Daily Challenge** and fully customizable games.
+A client-side single page application for a Mastermind-style game using **colors** - featuring a **Daily Challenge** and fully customizable games.
 <img width="1085" height="861" alt="image" src="https://github.com/user-attachments/assets/09a8b746-8053-4321-b6d5-0a909037720b" />
 
 ## Key files (start here)
