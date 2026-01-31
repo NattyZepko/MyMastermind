@@ -1,0 +1,96 @@
+:root {
+	--bottomTabs-bg: rgba(11, 16, 32, 0.82);
+	--bottomTabs-border: rgba(255, 255, 255, 0.14);
+	--bottomTabs-tabBg: rgba(255, 255, 255, 0.06);
+	--bottomTabs-tabBgHover: rgba(255, 255, 255, 0.09);
+	--bottomTabs-tabBgActive: rgba(255, 255, 255, 0.04);
+	--bottomTabs-text: rgba(255, 255, 255, 0.92);
+	--bottomTabs-muted: rgba(255, 255, 255, 0.72);
+	--bottomTabs-shadow: 0 18px 50px rgba(0, 0, 0, 0.42);
+}
+
+body.hasBottomTabs {
+	padding-bottom: var(--bottomTabsHeight, 88px);
+}
+
+.bottomTabs {
+	position: fixed;
+	left: 0;
+	right: 0;
+	bottom: 0;
+	z-index: 2000;
+	background: var(--bottomTabs-bg);
+	backdrop-filter: blur(10px);
+	border-top: 1px solid var(--bottomTabs-border);
+	box-shadow: var(--bottomTabs-shadow);
+}
+
+.bottomTabs__inner {
+	max-width: 980px;
+	margin: 0 auto;
+	padding: 0.6rem 1rem calc(0.6rem + env(safe-area-inset-bottom));
+}
+
+.bottomTabs__row {
+	display: grid;
+	grid-template-columns: repeat(4, minmax(0, 1fr));
+	gap: 0.6rem;
+}
+
+.bottomTabs__tab,
+.bottomTabs__tab:visited {
+	display: inline-flex;
+	align-items: center;
+	justify-content: center;
+	height: 44px;
+	border-radius: 12px;
+	border: 1px solid var(--bottomTabs-border);
+	background: var(--bottomTabs-tabBg);
+	color: var(--bottomTabs-text);
+	text-decoration: none;
+	font-weight: 650;
+	letter-spacing: 0.15px;
+	box-shadow:
+		0 10px 22px rgba(0, 0, 0, 0.25),
+		0 0 0 3px rgba(255, 255, 255, 0.03);
+	transition:
+		transform 140ms ease,
+		background-color 140ms ease,
+		box-shadow 140ms ease;
+}
+
+.bottomTabs__tab:hover {
+	background: var(--bottomTabs-tabBgHover);
+}
+
+.bottomTabs__tab:active {
+	transform: translateY(1px);
+	box-shadow:
+		0 6px 14px rgba(0, 0, 0, 0.26),
+		0 0 0 3px rgba(255, 255, 255, 0.02);
+}
+
+.bottomTabs__tab--active {
+	background: var(--bottomTabs-tabBgActive);
+	color: var(--bottomTabs-muted);
+	transform: translateY(2px);
+	box-shadow:
+		inset 0 2px 10px rgba(0, 0, 0, 0.35),
+		0 4px 10px rgba(0, 0, 0, 0.18);
+	cursor: default;
+}
+
+@media (max-width: 420px) {
+	.bottomTabs__inner {
+		padding-left: 0.75rem;
+		padding-right: 0.75rem;
+	}
+
+	.bottomTabs__row {
+		gap: 0.45rem;
+	}
+
+	.bottomTabs__tab {
+		font-size: 0.95rem;
+	}
+}

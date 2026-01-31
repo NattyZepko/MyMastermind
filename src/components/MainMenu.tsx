@@ -287,6 +287,13 @@ export function MainMenu({
 					<p className="subtitle">
 						Set your difficulty, and select game mode. Press Play when ready.
 					</p>
+					<p className="muted" style={{ marginTop: '0.35rem' }}>
+						<a href="/controls.html">Controls & gestures</a>
+						<span aria-hidden="true"> · </span>
+						<a href="/how-to-play.html">How to play</a>
+						<span aria-hidden="true"> · </span>
+						<a href="/qa.html">Q&amp;A</a>
+					</p>
 				</div>
 			</header>
 

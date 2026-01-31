@@ -1,0 +1,213 @@
+<!doctype html>
+<html lang="en">
+	<head>
+		<meta charset="UTF-8" />
+		<meta name="viewport" content="width=device-width, initial-scale=1.0" />
+		<title>Natty Mastermind — Q&amp;A</title>
+		<meta
+			name="description"
+			content="Natty Mastermind Q&A: a place for questions and feedback."
+		/>
+		<link rel="stylesheet" href="/bottom-tabs.css" />
+		<script defer src="/bottom-tabs.js"></script>
+		<style>
+			:root {
+				color-scheme: dark;
+				--bg: #0b1020;
+				--panel: rgba(255, 255, 255, 0.06);
+				--text: rgba(255, 255, 255, 0.92);
+				--muted: rgba(255, 255, 255, 0.7);
+				--link: #93c5fd;
+				--border: rgba(255, 255, 255, 0.12);
+			}
+
+			body {
+				margin: 0;
+				font-family:
+					system-ui,
+					-apple-system,
+					Segoe UI,
+					Roboto,
+					Ubuntu,
+					Cantarell,
+					Noto Sans,
+					Arial,
+					sans-serif;
+				line-height: 1.55;
+				background:
+					radial-gradient(1200px 600px at 20% 0%, #13224a, transparent),
+					var(--bg);
+				color: var(--text);
+			}
+
+			main {
+				max-width: 900px;
+				margin: 0 auto;
+				padding: 2rem 1rem 3rem;
+			}
+
+			header {
+				display: flex;
+				flex-wrap: wrap;
+				align-items: baseline;
+				justify-content: space-between;
+				gap: 0.75rem;
+				margin-bottom: 1rem;
+			}
+
+			h1 {
+				margin: 0;
+				font-size: 1.75rem;
+				letter-spacing: 0.2px;
+			}
+
+			p {
+				margin: 0.75rem 0;
+			}
+
+			a {
+				color: var(--link);
+			}
+
+			.card {
+				background: var(--panel);
+				border: 1px solid var(--border);
+				border-radius: 12px;
+				padding: 1rem;
+				margin: 1rem 0;
+			}
+
+			h2 {
+				margin: 0 0 0.5rem;
+				font-size: 1.1rem;
+			}
+
+			.small {
+				color: var(--muted);
+				font-size: 0.95rem;
+			}
+
+			.profile {
+				display: flex;
+				flex-wrap: wrap;
+				gap: 1rem;
+				align-items: flex-start;
+			}
+
+			.profileImage {
+				width: 160px;
+				height: 160px;
+				object-fit: cover;
+				border-radius: 12px;
+				border: 1px solid var(--border);
+				background: rgba(255, 255, 255, 0.04);
+			}
+
+			.profileBody {
+				flex: 1;
+				min-width: 240px;
+			}
+		</style>
+	</head>
+	<body data-active-tab="qa">
+		<main>
+			<header>
+				<h1>Q&amp;A</h1>
+				<nav class="small">
+					<a href="/">Back to game</a>
+					<span aria-hidden="true"> · </span>
+					<a href="/how-to-play.html">How to play</a>
+					<span aria-hidden="true"> · </span>
+					<a href="/controls.html">Controls</a>
+				</nav>
+			</header>
+
+			<p class="small">The questions I want to answer, at least.</p>
+
+			<section class="card">
+				<h2>Who are you?</h2>
+				<div class="profile">
+					<img
+						src="/qa-media/natty-image.jpg"
+						alt="Natty"
+						class="profileImage"
+						loading="lazy"
+					/>
+					<div class="profileBody">
+						<p>
+							My name is Natty (Hence the title).<br />
+							I'm a software developer and the creator of this game. I made this
+							game as a fun project to challenge myself and others, and I made
+							versions of it before with different rules and mechanics, to learn
+							different programming languages and stacks.
+						</p>
+					</div>
+				</div>
+			</section>
+			<section class="card">
+				<h2>I have an idea for your game, can I share it?</h2>
+				<p>
+					Sure! I'd love to hear your feedback. In fact, many existing features
+					are already inspired by user suggestions. You can reach me at
+					<a href="mailto:Natty.Zepko@gmail.com">Natty.Zepko@gmail.com</a>.
+				</p>
+			</section>
+			<section class="card">
+				<h2>Something isn't working / I found a bug, what do I do?</h2>
+				<p>
+					Also, write to me at:
+					<a href="mailto:Natty.Zepko@gmail.com">Natty.Zepko@gmail.com</a>.
+					Include as much detail as you can, images and video, too, and I'll
+					look into it!
+				</p>
+			</section>
+			<section class="card">
+				<h2>The colors are hard to distinguish, what can I do?</h2>
+				<p>
+					Under the "Advanced Palette" section in the main menu, you can
+					customize the colors used in the game to better suit your needs. You
+					can also enable the "Show Numbers" option to display numbers inside
+					the colored pegs for easier identification.
+				</p>
+			</section>
+
+			<section class="card">
+				<h2>Can you make it in another language?</h2>
+				<p>I don't think that's needed, given how simple the game is.</p>
+			</section>
+
+			<section class="card">
+				<h2>Something isn't working / I found a bug, what do I do?</h2>
+				<p>
+					Also, write to me at:
+					<a href="mailto:Natty.Zepko@gmail.com">Natty.Zepko@gmail.com</a>.
+					Include as much detail as you can, images and video, too, and I'll
+					look into it!
+				</p>
+			</section>
+			<section class="card">
+				<h2>The guess-results don't make sense! I'm sure there's a bug!</h2>
+				<p>
+					Prove me wrong by giving-up and sharing your guess and secret code
+					with me.
+				</p>
+			</section>
+			<section class="card">
+				<h2>Can I see the source-code?</h2>
+				<p>
+					<a href="https://github.com/NattyZepko/MyMastermind">Sure.</a>
+				</p>
+			</section>
+			<section class="card">
+				<h2>
+					I want harder challenge / The daily Challenge is too easy / hard!
+				</h2>
+				<p>
+					That's ok, but the daily challenge is meant to be just like that. I'm
+					not planning to change its difficulty. You can always play custom
+					games with your own settings if you want a different experience.
+				</p>
+			</section>
+		</main>
+	</body>
+</html>

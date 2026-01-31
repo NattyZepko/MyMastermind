@@ -1,0 +1,286 @@
+<!doctype html>
+<html lang="en">
+	<head>
+		<meta charset="UTF-8" />
+		<meta name="viewport" content="width=device-width, initial-scale=1.0" />
+		<title>Natty Mastermind — Controls</title>
+		<meta
+			name="description"
+			content="Controls and gestures for playing Natty Mastermind (mouse, touch, drag & drop)."
+		/>
+		<link rel="stylesheet" href="/bottom-tabs.css" />
+		<script defer src="/bottom-tabs.js"></script>
+		<style>
+			:root {
+				color-scheme: dark;
+				--bg: #0b1020;
+				--panel: rgba(255, 255, 255, 0.06);
+				--text: rgba(255, 255, 255, 0.92);
+				--muted: rgba(255, 255, 255, 0.7);
+				--link: #93c5fd;
+				--border: rgba(255, 255, 255, 0.12);
+			}
+
+			body {
+				margin: 0;
+				font-family:
+					system-ui,
+					-apple-system,
+					Segoe UI,
+					Roboto,
+					Ubuntu,
+					Cantarell,
+					Noto Sans,
+					Arial,
+					sans-serif;
+				line-height: 1.55;
+				background:
+					radial-gradient(1200px 600px at 20% 0%, #13224a, transparent),
+					var(--bg);
+				color: var(--text);
+			}
+
+			main {
+				max-width: 860px;
+				margin: 0 auto;
+				padding: 2rem 1rem 3rem;
+			}
+
+			header {
+				display: flex;
+				flex-wrap: wrap;
+				align-items: baseline;
+				justify-content: space-between;
+				gap: 0.75rem;
+				margin-bottom: 1rem;
+			}
+
+			h1 {
+				margin: 0;
+				font-size: 1.75rem;
+				letter-spacing: 0.2px;
+			}
+
+			p {
+				margin: 0.75rem 0;
+			}
+
+			a {
+				color: var(--link);
+			}
+
+			.card {
+				background: var(--panel);
+				border: 1px solid var(--border);
+				border-radius: 12px;
+				padding: 1rem;
+				margin: 1rem 0;
+			}
+
+			.media {
+				margin-top: 0.75rem;
+				border-radius: 10px;
+				border: 1px solid var(--border);
+				background: rgba(255, 255, 255, 0.03);
+				overflow: hidden;
+			}
+
+			.media.isSmall {
+				max-width: 360px;
+				margin-left: auto;
+				margin-right: auto;
+			}
+
+			.media img {
+				display: block;
+				width: 100%;
+				height: auto;
+			}
+
+			.media figcaption {
+				padding: 0.65rem 0.85rem;
+				color: var(--muted);
+				font-size: 0.95rem;
+			}
+
+			h2 {
+				margin: 0 0 0.5rem;
+				font-size: 1.1rem;
+			}
+
+			ul {
+				margin: 0.5rem 0 0;
+				padding-left: 1.25rem;
+			}
+
+			li {
+				margin: 0.35rem 0;
+			}
+
+			.small {
+				color: var(--muted);
+				font-size: 0.95rem;
+			}
+
+			kbd {
+				font-family: ui-monospace, SFMono-Regular, Menlo, monospace;
+				font-size: 0.95em;
+				padding: 0.05rem 0.35rem;
+				border: 1px solid var(--border);
+				border-bottom-width: 2px;
+				border-radius: 6px;
+				background: rgba(255, 255, 255, 0.06);
+			}
+		</style>
+	</head>
+	<body data-active-tab="controls">
+		<main>
+			<header>
+				<h1>Controls</h1>
+				<a href="/">Back to game</a>
+			</header>
+
+			<p class="small">Each section includes a short demo GIF.</p>
+
+			<section class="card">
+				<h2>Select a color, then fill a peg</h2>
+				<ul>
+					<li>Tap/click a color in the palette to select it.</li>
+					<li>
+						Then tap/click a peg slot in the guess row to fill it with the
+						selected color.
+					</li>
+					<li>
+						You can also tap/click an already-filled peg to overwrite it with
+						the currently selected color.
+					</li>
+				</ul>
+				<figure class="media">
+					<img
+						src="/controls-media/ClickingOnPalette.gif"
+						alt="Selecting a palette color and filling pegs"
+						loading="lazy"
+						decoding="async"
+					/>
+					<figcaption>Select a color, then tap pegs to fill.</figcaption>
+				</figure>
+			</section>
+
+			<section class="card">
+				<h2>Drag a color onto a peg</h2>
+				<ul>
+					<li>
+						Drag a color from the palette onto a peg slot in the guess row to
+						fill that slot.
+					</li>
+					<li>
+						You can also drag from an existing colored peg in your current guess
+						onto another slot to fill it with that same color.
+					</li>
+				</ul>
+				<figure class="media">
+					<img
+						src="/controls-media/DragColors.gif"
+						alt="Dragging colors from the palette and between pegs"
+						loading="lazy"
+						decoding="async"
+					/>
+					<figcaption>
+						Drag from the palette or from an existing peg.
+					</figcaption>
+				</figure>
+			</section>
+
+			<section class="card">
+				<h2>Remove a color from a peg</h2>
+				<ul>
+					<li>Desktop: right-click a filled peg to clear it.</li>
+					<li>
+						You can also use the “Clear colors” button to empty the whole guess.
+					</li>
+					<li class="small">
+						On mobile, use “Clear colors” or overwrite pegs (right-click isn’t
+						available).
+					</li>
+				</ul>
+				<figure class="media">
+					<img
+						src="/controls-media/rightClick.gif"
+						alt="Right-clicking a peg to clear it"
+						loading="lazy"
+						decoding="async"
+					/>
+					<figcaption>Desktop: right-click clears a peg.</figcaption>
+				</figure>
+			</section>
+
+			<section class="card">
+				<h2>Reuse a previous guess</h2>
+				<ul>
+					<li>
+						Tap/click a previous guess in the Guess History to load it into the
+						current guess row.
+					</li>
+					<li>
+						This is useful for making small edits to a past guess instead of
+						re-entering it.
+					</li>
+				</ul>
+				<figure class="media">
+					<img
+						src="/controls-media/ClickingGuessHistory.gif"
+						alt="Clicking a previous guess in the guess history to reuse it"
+						loading="lazy"
+						decoding="async"
+					/>
+					<figcaption>Click a history row to reload it.</figcaption>
+				</figure>
+			</section>
+
+			<section class="card">
+				<h2>Mobile: resize the guess history</h2>
+				<ul>
+					<li>
+						Use a two-finger pinch gesture on the Guess History panel to shrink
+						or enlarge history rows.
+					</li>
+					<li>This helps you fit more guesses on screen.</li>
+				</ul>
+				<p class="small">
+					Tip: the app suppresses pull-to-refresh while you’re playing to avoid
+					accidental game resets.
+				</p>
+				<figure class="media isSmall">
+					<img
+						src="/controls-media/resizePinching.gif"
+						alt="Pinch gesture resizing the guess history"
+						loading="lazy"
+						decoding="async"
+					/>
+					<figcaption>Pinch on the history panel to resize rows.</figcaption>
+				</figure>
+			</section>
+
+			<section class="card">
+				<h2>Submit a guess</h2>
+				<ul>
+					<li>Click “Guess” to submit your current row.</li>
+					<li>
+						Keyboard: press <kbd>Enter</kbd> to submit (same as clicking
+						“Guess”).
+					</li>
+					<li>Your guess is added to the Guess History with feedback.</li>
+				</ul>
+				<figure class="media">
+					<img
+						src="/controls-media/EnterKey.gif"
+						alt="Submitting a guess with the Enter key"
+						loading="lazy"
+						decoding="async"
+					/>
+					<figcaption>Press Enter to submit (same as Guess).</figcaption>
+				</figure>
+			</section>
+		</main>
+	</body>
+</html>
